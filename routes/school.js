@@ -1,4 +1,5 @@
-var express = require('express');
+var express = require('express'),
+    uuidV4 = require('uuid/v4');
 
 var routes = function (School) {
     var schoolRouter = express.Router();
@@ -15,10 +16,10 @@ var routes = function (School) {
         .post(function (req, res) {
             var school = new School(req.body);
             school.id = uuidV4();
-            School.create(school, function (err, school) {
+            School.create(school, function (err, newSchool) {
                 if (err)
                     res.status(500).send(err);
-                else
+                else                    
                     res.status(201).send(school);
             });
         });
