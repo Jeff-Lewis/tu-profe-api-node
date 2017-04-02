@@ -1,0 +1,11 @@
+{
+  "name": "tu-profe-api-node",
+  "version": "1.0.0",
+  "description": "Tu Profe API in NODE",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "da.prieto1@uniandes.edu.co",
+  "license": "ISC"
+}
