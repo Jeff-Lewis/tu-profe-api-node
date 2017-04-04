@@ -4,7 +4,8 @@ var express = require('express'),
     dynamoose = require('dynamoose');
 
 var School = require('./models/school'),
-    Course = require('./models/course');
+    Course = require('./models/course'),
+    Teacher = require('./models/teacher');
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -26,9 +27,11 @@ app.use(function(req, res, next) {
 
 schoolRouter = require('./routes/school')(School);
 courseRouter = require('./routes/course')(Course);
+teacherRouter = require('./routes/teacher')(Teacher);
 
 app.use('/api/schools', schoolRouter);
 app.use('/api/courses', courseRouter);
+app.use('/api/teachers', teacherRouter);
 
 app.listen(port, function () {
     console.log('App is running in port: ' + port);
