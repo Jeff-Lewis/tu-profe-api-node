@@ -13,7 +13,6 @@ var routes = function (Teacher) {
                 .then(newTeacher => {
                     return newTeacher;
                 }, err => {
-                    console.log(err);
                     res.status(500).send(err);
                 });
             res.status(201).send(teacher);

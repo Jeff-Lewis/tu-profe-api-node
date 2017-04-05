@@ -1,5 +1,7 @@
 var express = require('express');
 
+var TeacherService = require('../services/teacher')();
+
 var routes = function (Teacher) {
     var teacherRouter = express.Router();
 
@@ -14,15 +16,14 @@ var routes = function (Teacher) {
             });
         });
 
-    teacherRouter.route('/:id')
+    teacherRouter.route('/:teacherId')
         .get(function (req, res) {
-            Teacher.get({ id: req.params.id }, function (err, teacher) {
-                if (err)
-                    console.log(err);
-                    //res.status(404).send(err);
-                else
+            var teacher = TeacherService.getTeacherById(req.params.teacherId)
+                .then(teacher => {
                     res.status(200).send(teacher);
-            });
+                },err => {
+                    res.status(404).send(err);
+                });
         });
 
     return teacherRouter;
