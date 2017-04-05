@@ -1,19 +1,23 @@
-var express = require('express'),
-    uuidV4 = require('uuid/v4');
+var express = require('express');
+var Promise = require('promise');
+    
+var TeacherService = require('../services/teacher')();
 
 var routes = function (Teacher) {
     var sessionRoute = express.Router();
 
     sessionRoute.route('/teacher/signup')
-        .post(function(req, res) {
+        .post((req, res) => {
             var teacher = new Teacher(req.body);
-            teacher.id = uuidV4();
-            Teacher.create(teacher, function (err, newTeacher) {
-                if (err)
+            var newTeacher = TeacherService.createTeacher(teacher)
+                .then(newTeacher => {
+                    return newTeacher;
+                }, err => {
+                    console.log(err);
                     res.status(500).send(err);
-                else                    
-                    res.status(201).send(teacher);
-            });
+                });
+            res.status(201).send(teacher);
+            
         });
 
     sessionRoute.route('/teacher/login')

@@ -6,6 +6,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:daprieto1/tu-profe-api-node.git"
+  },
   "author": "da.prieto1@uniandes.edu.co",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.17.1",
+    "dynamoose": "^0.7.0",
+    "express": "^4.15.2",
+    "gulp": "^3.9.1",
+    "gulp-nodemon": "^2.2.1",
+    "promise": "^7.1.1",
+    "uuid": "^3.0.1"
+  }
 }
