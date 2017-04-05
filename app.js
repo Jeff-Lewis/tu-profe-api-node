@@ -25,10 +25,12 @@ app.use(function(req, res, next) {
   next();
 });
 
+sessionRouter = require('./routes/session')(Teacher);
 schoolRouter = require('./routes/school')(School);
 courseRouter = require('./routes/course')(Course);
 teacherRouter = require('./routes/teacher')(Teacher);
 
+app.use('/api/session', sessionRouter);
 app.use('/api/schools', schoolRouter);
 app.use('/api/courses', courseRouter);
 app.use('/api/teachers', teacherRouter);
