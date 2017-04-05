@@ -1,7 +1,7 @@
 var express = require('express');
 var Promise = require('promise');
     
-var TeacherService = require('../services/teacher')();
+var TeacherService = require('../services/teacher');
 
 var routes = function (Teacher) {
     var sessionRoute = express.Router();
