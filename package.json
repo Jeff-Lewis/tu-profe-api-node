@@ -4,7 +4,7 @@
   "description": "Tu Profe API in NODE",
   "main": "app.js",
   "scripts": {
-    "start":"node app.js",
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -14,11 +14,14 @@
   "author": "da.prieto1@uniandes.edu.co",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.40.0",
     "body-parser": "^1.17.1",
     "dynamoose": "^0.7.0",
     "express": "^4.15.2",
+    "express-fileupload": "^0.1.2",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",
+    "multer": "^1.3.0",
     "promise": "^7.1.1",
     "uuid": "^3.0.1"
   }

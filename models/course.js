@@ -2,13 +2,13 @@ var dynamoose = require('dynamoose'),
     Schema = dynamoose.Schema;
 
 var courseSchema = new Schema({
-    Placa: {
+    id: {
         type: String,
         hashKey: true
     },
-    TurnOn: {
+    name: {
         type: Number
     }
 });
 
-module.exports = dynamoose.model('Auto', courseSchema);
+module.exports = dynamoose.model('Course', courseSchema);

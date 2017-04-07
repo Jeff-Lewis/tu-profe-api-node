@@ -1,7 +1,8 @@
 var uuidV4 = require('uuid/v4');
-var Teacher = require('../models/teacher');
 var Promise = require('promise');
 
+var Teacher = require('../models/teacher');
+var S3Services = require('../services/s3');
 var TeacherServices = {};
 
     
@@ -46,6 +47,11 @@ TeacherServices.getTeachers = function () {
 
 TeacherServices.updateTeacher = function () {
 
+};
+
+TeacherServices.uploadCurriculum = function(teacherId,curriculum) {
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => S3Services(teacher.id, curriculum));
 };
 
 module.exports = TeacherServices;

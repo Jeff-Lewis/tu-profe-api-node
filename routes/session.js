@@ -21,9 +21,8 @@ var routes = function (Teacher) {
 
     sessionRoute.route('/teacher/login')
         .post(function(req, res) {            
-            console.log(req.body.username);
-            Teacher.scan('email').contains(req.body.username).exec(function (err, teachers) {
-                console.log(teachers);                
+            console.log(req.query.username);
+            Teacher.scan('email').contains(req.query.username).exec(function (err, teachers) {
                 if (err || teachers === undefined)
                     res.status(403).send(err);
                 else

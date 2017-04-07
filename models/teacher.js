@@ -6,6 +6,7 @@ var teacherSchema = new Schema({
         type: String,
         hashKey: true
     },
+    state: Number,
     cellPhone: String,
     phone: String,
     email: String,
@@ -24,14 +25,28 @@ var teacherSchema = new Schema({
     //acceptGameRules: Boolean,
     //cultureForm: Boolean,
 
-    accountHolderIdentification: String,
-    accountHolderName: String,
-    accountNumber: String,
-    accountType: String,
-    bank: String,
-
-    interview: String
+    interview: String,
+    
+    //Exam Information
+    exam: {
+        type:'Map',
+        map:{
+            wrongAnswers: {type:String}
+        }
+    },
+    
+    //Bank Information
+    bankAccount:{
+        type:'Map',
+        map:{
+            holderIdentification: String,
+            holderName: String,
+            number: String,
+            type: String,
+            bank: String
+        }
+    }
 
 });
 
-module.exports = dynamoose.model('teacher', teacherSchema);
+module.exports = dynamoose.model('Teacher', teacherSchema);
