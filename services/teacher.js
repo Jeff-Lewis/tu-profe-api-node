@@ -26,7 +26,7 @@ TeacherServices.getTeacherById = teacherId => {
     return new Promise((resolve, reject) => {
         Teacher.get({ id: teacherId }, (err, teacher) => {
             if (err) reject(err);
-            else resolve(teacher);
+            else resolve(teacher);   
         });
     });
 };
@@ -50,8 +50,12 @@ TeacherServices.updateTeacher = function () {
 };
 
 TeacherServices.uploadCurriculum = function(teacherId,curriculum) {
+    var bucketName = 'tu-profe/teachers/curriculum';
+    var key = teacherId + '.docx';
+    var file = curriculum;
+    
     return TeacherServices.getTeacherById(teacherId)
-        .then(teacher => S3Services(teacher.id, curriculum));
+        .then(teacher => S3Services.uploadFile(bucketName, key, file));
 };
 
 module.exports = TeacherServices;

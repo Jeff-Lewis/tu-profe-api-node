@@ -1,7 +1,8 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     uuidV4 = require('uuid/v4'),
-    dynamoose = require('dynamoose');
+    dynamoose = require('dynamoose')
+    multer = require('multer');
 
 var School = require('./models/school'),
     Course = require('./models/course'),

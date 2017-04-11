@@ -4,17 +4,7 @@ var express = require('express'),
 
 var TeacherService = require('../services/teacher');
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, '../uploads');
-    },
-    filename: function (req, file, cb) {
-        cb(null, Date.now().toString(16) + path.extname(file.originalname));
-    }
-});
-var upload = multer({
-  storage: storage
-});
+var upload = multer({ dest: '..uploads/' })
 
 var routes = function (Teacher) {
     var teacherRouter = express.Router();
@@ -50,9 +40,14 @@ var routes = function (Teacher) {
                 });
         });
     
-    teacherRouter.post('/curriculum',upload.single('file'),(req, res) => {
+    teacherRouter.post('/curriculum/:teacherId',upload.single('file'),(req, res) => {
             var file = req.file;
-            res.send('OK');
+            TeacherService.uploadCurriculum(req.params.teacherId,file)
+                .then(data => {
+                    res.status(200).send(data);
+                },err => {
+                    res.status(404).send(err);
+                });
         });
 
     return teacherRouter;
