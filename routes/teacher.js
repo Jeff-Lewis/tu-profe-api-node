@@ -1,7 +1,6 @@
 var express = require('express'),
     multer = require('multer'),
-    path = require('path'),
-    async = require('async');
+    path = require('path');
 
 var TeacherService = require('../services/teacher');
 
@@ -42,7 +41,7 @@ var routes = function (Teacher) {
     
     teacherRouter.route('/email/:email')
         .get(function (req, res) {
-            var teacher = TeacherService.getTeacherByEmail(req.params.email)
+            TeacherService.getTeacherByEmail(req.params.email)
                 .then(teacher => {
                     res.status(200).send(teacher);
                 },err => {
@@ -61,24 +60,12 @@ var routes = function (Teacher) {
         });
     
     teacherRouter.post('/accept-game-rules/:teacherId',(req, res) => {
-            var file = req.file;
-            var teacher;
-            
-            async.parallel([
-                callback => {
-                    TeacherService.acceptGameRules(req.params.teacherId)
-                        .then(an => {
-                            teacher = an;
-                            callback();
-                        }, err => {
-                            res.status(404).send(err);
-                        });   
-                }
-                ],() => {
-                    console.log(teacher);
-                    res.status(200).send(teacher);
+            TeacherService.acceptGameRules(req.params.teacherId)
+                .then(teacher => {
+                    res.status(200).send();
+                },err => {
+                    res.status(404).send(err);
                 });
-            
         });
 
     return teacherRouter;
