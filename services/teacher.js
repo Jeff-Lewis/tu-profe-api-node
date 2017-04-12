@@ -25,7 +25,6 @@ TeacherServices.createTeacher = function (teacher) {
 TeacherServices.getTeacherById = teacherId => {
     return new Promise((resolve, reject) => {
         Teacher.get({ id: teacherId }, (err, teacher) => {
-            console.log(err, teacher);
             if (err || teacher === undefined) {reject('Teacher not found');}
             else {resolve(teacher);}
         });
@@ -47,8 +46,6 @@ TeacherServices.getTeachers = function () {
 };
 
 TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
-    console.log(teacherId, teacherUpdated);
-    
     return TeacherServices.getTeacherById(teacherId)
         .then(teacher => {
             return new Promise((resolve, reject)=>{
@@ -68,7 +65,12 @@ TeacherServices.uploadCurriculum = function(teacherId,curriculum) {
     var file = curriculum;
     
     return TeacherServices.getTeacherById(teacherId)
-        .then(teacher => S3Services.uploadFile(bucketName, key, file));
+        .then(teacher => S3Services.uploadFile(bucketName, key, file))
+        .then(data => TeacherServices.getTeacherById(teacherId))
+        .then(teacher => {
+            teacher.state = 1;
+            TeacherServices.updateTeacher(teacherId, teacher);
+        });
 };
 
 module.exports = TeacherServices;
