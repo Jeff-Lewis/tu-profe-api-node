@@ -6,7 +6,8 @@ var express = require('express'),
 
 var School = require('./models/school'),
     Course = require('./models/course'),
-    Teacher = require('./models/teacher');
+    Teacher = require('./models/teacher'),
+    Interview = require('./models/interview');
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -30,11 +31,13 @@ sessionRouter = require('./routes/session')(Teacher);
 schoolRouter = require('./routes/school')(School);
 courseRouter = require('./routes/course')(Course);
 teacherRouter = require('./routes/teacher')(Teacher);
+interviewRouter = require('./routes/interview')(Interview);
 
 app.use('/api/session', sessionRouter);
 app.use('/api/schools', schoolRouter);
 app.use('/api/courses', courseRouter);
 app.use('/api/teachers', teacherRouter);
+app.use('/api/interviews', interviewRouter);
 
 app.listen(port, function () {
     console.log('App is running in port: ' + port);
