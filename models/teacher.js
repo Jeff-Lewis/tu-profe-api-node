@@ -2,28 +2,40 @@ var dynamoose = require('dynamoose'),
     Schema = dynamoose.Schema;
 
 var teacherSchema = new Schema({
-    id: {
-        type: String,
-        hashKey: true
-    },
-    state: Number,
-    cellPhone: String,
-    phone: String,
+    
+    //Account Data
+    id: {type: String,hashKey: true},
     email: String,
     password: String,
     name: String,
     lastName: String,
     identification: String,
+    
+    // Personal Data
+    cellPhone: String,
+    phone: String,
+    state: Number,
     city: String,
     neighborhood: String,
+    address : String,
     profileDescription: String,
-
+    
+    //Academical Data
     semester: Number,
     profession: String,
     gradeDate: Date,
-
-    //acceptGameRules: Boolean,
-    //cultureForm: Boolean,
+    
+    //Financial Data
+    bankAccount:{
+        type:'Map',
+        map:{
+            holderIdentification: String,
+            holderName: String,
+            number: String,
+            type: String,
+            bank: String
+        }
+    },
 
     interview: String,
     
@@ -35,17 +47,8 @@ var teacherSchema = new Schema({
         }
     },
     
-    //Bank Information
-    bankAccount:{
-        type:'Map',
-        map:{
-            holderIdentification: String,
-            holderName: String,
-            number: String,
-            type: String,
-            bank: String
-        }
-    }
+    //Auxiliar Variables
+    acceptGameRules : {type: Boolean, default: false}
 
 });
 

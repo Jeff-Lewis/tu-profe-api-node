@@ -9,9 +9,10 @@ var TeacherServices = {};
 /**
  * Create a new Teacher 
  */
-TeacherServices.createTeacher = function (teacher) {
+TeacherServices.createTeacher = teacher => {
     return new Promise(function (resolve, reject) {
         teacher.id = uuidV4();
+        teacher.acceptGameRules = false;
         Teacher.create(teacher, function(err,newTeacher){
             if (err) reject(err);
             else resolve(newTeacher);
@@ -59,7 +60,7 @@ TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
         
 };
 
-TeacherServices.uploadCurriculum = function(teacherId,curriculum) {
+TeacherServices.uploadCurriculum = (teacherId,curriculum) => {
     var bucketName = 'tu-profe/teachers/curriculum';
     var key = teacherId + '.docx';
     var file = curriculum;
@@ -71,6 +72,15 @@ TeacherServices.uploadCurriculum = function(teacherId,curriculum) {
             teacher.state = 1;
             TeacherServices.updateTeacher(teacherId, teacher);
         });
+};
+
+TeacherServices.acceptGameRules = teacherId => {
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => {
+            teacher.acceptGameRules = true;
+            return Promise.resolve(teacher);
+        })
+        .then(teacher => TeacherServices.updateTeacher(teacherId,teacher));
 };
 
 module.exports = TeacherServices;

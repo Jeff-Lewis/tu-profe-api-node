@@ -14,6 +14,7 @@
   "author": "da.prieto1@uniandes.edu.co",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.3.0",
     "aws-sdk": "^2.40.0",
     "body-parser": "^1.17.1",
     "dynamoose": "^0.7.0",
