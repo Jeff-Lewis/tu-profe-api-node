@@ -31,7 +31,7 @@ var routes = function (Teacher) {
 
     teacherRouter.route('/:teacherId')
         .get(function (req, res) {
-            var teacher = TeacherService.getTeacherById(req.params.teacherId)
+            TeacherService.getTeacherById(req.params.teacherId)
                 .then(teacher => {
                     res.status(200).send(teacher);
                 },err => {

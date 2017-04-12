@@ -1,5 +1,8 @@
 var express = require('express'),
     uuidV4 = require('uuid/v4');
+    
+var TeacherService = require('../services/teacher'),
+    InterviewService = require('../services/interview');
 
 var routes = function (Interview) {
     var interviewRouter = express.Router();
@@ -22,17 +25,17 @@ var routes = function (Interview) {
             });
         });
 
-    interviewRouter.route('/:id')
+    interviewRouter.route('/:interviewId')
         .get(function (req, res) {
-            Interview.get({ id: req.params.id }, function (err, interview) {
-                if (err || interview === undefined)
-                    res.status(404).send(err);
-                else
+            InterviewService.getInterviewById(req.params.interviewId)
+                .then(interview => {
                     res.status(200).send(interview);
-            });
+                },err => {
+                    res.status(404).send(err);
+                });
         });
         
-     interviewRouter.route('/active/all')
+    interviewRouter.route('/active/all')
         .get(function (req, res) {
             Interview.scan().exec(function (err, interviews) {
                 if (err) {res.status(500).send()}
@@ -46,6 +49,18 @@ var routes = function (Interview) {
                     res.send(interviews);   
                 }
             });
+        });
+        
+    interviewRouter.route('/active/take-place')
+        .post((req, res) => {
+            var teacherId = req.body.teacherId;
+            var interviewId = req.body.interviewId;
+            InterviewService.takePlace(interviewId,teacherId)
+                .then(() => {
+                    res.status(200).send();
+                },(err)=>{
+                    res.status(500).send(err);
+                });
         });
 
     

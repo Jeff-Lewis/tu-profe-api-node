@@ -47,6 +47,7 @@ TeacherServices.getTeachers = function () {
 };
 
 TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
+    console.info(teacherId, teacherUpdated)
     return TeacherServices.getTeacherById(teacherId)
         .then(teacher => {
             return new Promise((resolve, reject)=>{
@@ -57,7 +58,6 @@ TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
                 });
             });
         });
-        
 };
 
 TeacherServices.uploadCurriculum = (teacherId,curriculum) => {
