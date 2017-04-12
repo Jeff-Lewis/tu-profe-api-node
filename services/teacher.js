@@ -25,8 +25,9 @@ TeacherServices.createTeacher = function (teacher) {
 TeacherServices.getTeacherById = teacherId => {
     return new Promise((resolve, reject) => {
         Teacher.get({ id: teacherId }, (err, teacher) => {
-            if (err) reject(err);
-            else resolve(teacher);   
+            console.log(err, teacher);
+            if (err || teacher === undefined) {reject('Teacher not found');}
+            else {resolve(teacher);}
         });
     });
 };
@@ -45,8 +46,20 @@ TeacherServices.getTeachers = function () {
 
 };
 
-TeacherServices.updateTeacher = function () {
-
+TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
+    console.log(teacherId, teacherUpdated);
+    
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => {
+            return new Promise((resolve, reject)=>{
+                teacher = new Teacher(teacherUpdated);
+                teacher.save(err => {
+                    if(err) { reject(err) }
+                    else {resolve(teacher)}
+                });
+            });
+        });
+        
 };
 
 TeacherServices.uploadCurriculum = function(teacherId,curriculum) {

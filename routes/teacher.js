@@ -18,6 +18,15 @@ var routes = function (Teacher) {
                 else
                     res.send(teachers);
             });
+        })
+        .put((req, res) => {
+            var teacher = req.body;
+            TeacherService.updateTeacher(teacher.id, teacher)
+                .then(teacher => {
+                    res.status(200).send(teacher);
+                }, err => {
+                    res.status(500).send(err);
+                });
         });
 
     teacherRouter.route('/:teacherId')
