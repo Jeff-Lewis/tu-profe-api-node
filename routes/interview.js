@@ -55,10 +55,13 @@ var routes = function (Interview) {
         .post((req, res) => {
             var teacherId = req.body.teacherId;
             var interviewId = req.body.interviewId;
+            
             InterviewService.takePlace(interviewId,teacherId)
                 .then(() => {
+                    console.log('is returning');
                     res.status(200).send();
-                },(err)=>{
+                })
+                .catch((err)=>{
                     res.status(500).send(err);
                 });
         });

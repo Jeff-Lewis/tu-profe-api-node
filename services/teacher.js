@@ -53,7 +53,7 @@ TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
             return new Promise((resolve, reject)=>{
                 teacher = new Teacher(teacherUpdated);
                 teacher.save(err => {
-                    if(err) { reject(err) }
+                    if(err) { console.log(err);reject(err) }
                     else {resolve(teacher)}
                 });
             });
