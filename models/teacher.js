@@ -21,8 +21,9 @@ var teacherSchema = new Schema({
     profileDescription: String,
     
     //Academical Data
-    semester: Number,
+    university: String,
     profession: String,
+    semester: Number,
     gradeDate: Date,
     
     //Financial Data

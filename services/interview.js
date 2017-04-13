@@ -52,6 +52,7 @@ InterviewServices.takePlace = (interviewId, teacherId) => {
                 return Promise.reject('Profesor ya tiene entrevista asignada');
             } else {
                 teacher.interview = interviewId;
+                teacher.state = 2;
             }
 
             return {
@@ -61,13 +62,10 @@ InterviewServices.takePlace = (interviewId, teacherId) => {
 
         })
         .then(data => {
-            Promise.all([
+            return Promise.all([
                 InterviewServices.updateInterview(interviewId, data.interview),
                 TeacherService.updateTeacher(teacherId, data.teacher)
-            ])
-                .then(result => {
-                    console.log(result);
-                });
+            ]);
         });
 };
 

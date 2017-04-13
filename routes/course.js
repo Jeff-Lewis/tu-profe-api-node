@@ -8,7 +8,7 @@ var routes = function (Course) {
         .get(function (req, res) {
             Course.scan().exec(function (err, courses) {
                 if (err)
-                    console.log(err);
+                    res.status(500).send(err);
                 else
                     res.send(courses);
             });
@@ -17,9 +17,8 @@ var routes = function (Course) {
             var course = new Course(req.body);            
             course.id = uuidV4();            
             Course.create(course, function (err, newCourse) {
-                if (err)
-                    console.log(err);
-                    //res.status(500).send(err);
+                if (err)                    
+                    res.status(500).send(err);
                 else
                     res.status(201).send(course);
             });
