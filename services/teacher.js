@@ -2,6 +2,7 @@ var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
 
 var Teacher = require('../models/teacher');
+var TeacheState = require('../models/enum/teacherState');
 var S3Services = require('../services/s3');
 var TeacherServices = {};
 
@@ -78,6 +79,24 @@ TeacherServices.acceptGameRules = teacherId => {
     return TeacherServices.getTeacherById(teacherId)
         .then(teacher => {
             teacher.acceptGameRules = true;
+            return Promise.resolve(teacher);
+        })
+        .then(teacher => TeacherServices.updateTeacher(teacherId,teacher));
+};
+
+TeacherServices.takeExam = (teacherId, exam) => {
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => {
+            teacher.exam = exam;
+            return Promise.resolve(teacher);
+        })
+        .then(teacher => TeacherServices.updateTeacher(teacherId,teacher));
+};
+
+TeacherServices.activateAccount = (teacherId, exam) => {
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => {
+            teacher.state = TeacheState.ACTIVE.value;
             return Promise.resolve(teacher);
         })
         .then(teacher => TeacherServices.updateTeacher(teacherId,teacher));

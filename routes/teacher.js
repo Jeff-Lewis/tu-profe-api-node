@@ -68,6 +68,24 @@ var routes = function (Teacher) {
                 });
         });
 
+    teacherRouter.post('/take-exam/:teacherId',(req, res) => {
+            TeacherService.takeExam(req.params.teacherId, req.body)
+                .then(teacher => {
+                    res.status(200).send();
+                },err => {
+                    res.status(404).send(err);
+                });
+        });
+    
+    teacherRouter.post('/activate-account/:teacherId',(req, res) => {
+            TeacherService.activateAccount(req.params.teacherId)
+                .then(teacher => {
+                    res.status(200).send();
+                },err => {
+                    res.status(404).send(err);
+                });
+        });
+
     return teacherRouter;
 };
 

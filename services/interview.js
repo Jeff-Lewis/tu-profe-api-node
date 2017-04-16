@@ -6,6 +6,22 @@ var TeacherService = require('../services/teacher');
 
 var InterviewServices = {};
 
+InterviewServices.getAll = () => {
+    return new Promise((resolve, reject) => {
+        Interview.scan().exec(function (err, interviews) {
+            if (err) {
+                reject(err);
+            }
+            else {
+                interviews.forEach(interview => {
+                    interview.interviewed = interview.interviewed || [];
+                });
+                resolve(interviews);
+            }
+        });
+    });
+};
+
 InterviewServices.getInterviewById = interviewId => {
     return new Promise((resolve, reject) => {
         Interview.get({ id: interviewId }, (err, interview) => {
@@ -40,7 +56,7 @@ InterviewServices.takePlace = (interviewId, teacherId) => {
     ])
         .then(([interview, teacher]) => {
 
-            if (interview.interviewed.length >= interview.capacity) {                
+            if (interview.interviewed.length >= interview.capacity) {
                 return Promise.reject('Entrevista llena');
             } else if (interview.interviewed.indexOf(teacherId) > -1) {
                 return Promise.reject('Profesor ya esta agendado en esta entrevista');
@@ -48,7 +64,7 @@ InterviewServices.takePlace = (interviewId, teacherId) => {
                 interview.interviewed.push(teacherId);
             }
 
-            if (teacher.interview !== undefined) {                
+            if (teacher.interview !== undefined) {
                 return Promise.reject('Profesor ya tiene entrevista asignada');
             } else {
                 teacher.interview = interviewId;
