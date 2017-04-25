@@ -10,7 +10,6 @@ var routes = AdvisoryService => {
             var advisoryService = req.body;            
             AdvisoryServiceServices.calculate(advisoryService)
                 .then(advisoryService => {
-                    console.log(advisoryService);
                     res.status(200).send(advisoryService);
                 })
                 .catch(err => {

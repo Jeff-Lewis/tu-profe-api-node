@@ -8,9 +8,10 @@ var School = require('./models/school'),
     Course = require('./models/course'),
     Profession = require('./models/profession'),
     Teacher = require('./models/teacher'),
+    Student = require('./models/student'),
     Interview = require('./models/interview'),
     Training = require('./models/training'),
-    AdvisoryService = require('./models/advisoryService');;
+    AdvisoryService = require('./models/advisoryService');    
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -31,7 +32,7 @@ app.use(function (req, res, next) {
     next();
 });
 
-sessionRouter = require('./routes/session')(Teacher);
+sessionRouter = require('./routes/session')(Teacher, Student);
 schoolRouter = require('./routes/school')(School);
 courseRouter = require('./routes/course')(Course);
 professionRouter = require('./routes/profession')(Profession);
