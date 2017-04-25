@@ -9,7 +9,8 @@ var School = require('./models/school'),
     Profession = require('./models/profession'),
     Teacher = require('./models/teacher'),
     Interview = require('./models/interview'),
-    Training = require('./models/training');
+    Training = require('./models/training'),
+    AdvisoryService = require('./models/advisoryService');;
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -36,7 +37,8 @@ courseRouter = require('./routes/course')(Course);
 professionRouter = require('./routes/profession')(Profession);
 teacherRouter = require('./routes/teacher')(Teacher);
 interviewRouter = require('./routes/interview')(Interview);
-trainingRoute = require('./routes/training')(Training);
+trainingRoute = require('./routes/training')(Training),
+advisoryServiceRoute = require('./routes/advisoryService')(AdvisoryService);
 
 app.use('/api/session', sessionRouter);
 app.use('/api/schools', schoolRouter);
@@ -45,6 +47,7 @@ app.use('/api/professions', professionRouter);
 app.use('/api/teachers', teacherRouter);
 app.use('/api/interviews', interviewRouter);
 app.use('/api/trainings', trainingRoute);
+app.use('/api/advisory-services', advisoryServiceRoute);
 
 app.listen(port, function () {
     console.log('App is running in port: ' + port);
