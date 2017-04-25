@@ -11,7 +11,7 @@ var TeacherServices = {};
  * Create a new Teacher 
  */
 TeacherServices.createTeacher = teacher => {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
         teacher.id = uuidV4();
         teacher.acceptGameRules = false;
         Teacher.create(teacher, function (err, newTeacher) {
