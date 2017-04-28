@@ -46,7 +46,7 @@ InterviewServices.updateInterview = (interviewId, interviewUpdated) => {
             });
         });
 };
-
+/*
 InterviewServices.takePlace = (interviewId, teacherId) => {
     var teacherBackUp, interviewBackUp;
 
@@ -84,5 +84,5 @@ InterviewServices.takePlace = (interviewId, teacherId) => {
             ]);
         });
 };
-
+*/
 module.exports = InterviewServices;

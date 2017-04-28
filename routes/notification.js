@@ -6,6 +6,14 @@ var routes = Notification => {
     var notificationRouter = express.Router();
     
     notificationRouter.route('/')
+        .get(function (req, res) {
+            Notification.scan().exec(function (err, notifications) {
+                if (err)
+                    res.status(500).send(err);
+                else
+                    res.send(notifications);
+            });
+        })
         .post((req, res) => {
             var notification = req.body;
             NotificationServices.createNotification(notification)
@@ -13,9 +21,11 @@ var routes = Notification => {
                     res.status(201).send(notification);
                 })
                 .catch(err => {
-                    res.status(err).send(err);
+                    res.status(500).send(err);
                 });
         });
 
     return notificationRouter;
 };
+
+module.exports = routes;

@@ -13,8 +13,7 @@ var routes = function (Teacher) {
         .get(function (req, res) {
             Teacher.scan().exec(function (err, teachers) {
                 if (err)
-                    console.log(err);
-                    //res.status(500).send(err);
+                    res.status(500).send(err);
                 else
                     res.send(teachers);
             });

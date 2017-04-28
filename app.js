@@ -11,11 +11,8 @@ var School = require('./models/school'),
     Student = require('./models/student'),
     Interview = require('./models/interview'),
     Training = require('./models/training'),
-<<<<<<< HEAD
-    Notification = require('./models/notification');
-=======
+    Notification = require('./models/notification'),
     AdvisoryService = require('./models/advisoryService');    
->>>>>>> dc4568e86692390861d9ec3fcd1fefee81da275a
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -43,7 +40,7 @@ professionRouter = require('./routes/profession')(Profession);
 teacherRouter = require('./routes/teacher')(Teacher);
 interviewRouter = require('./routes/interview')(Interview);
 notificationRoute = require('./routes/notification')(Notification);
-trainingRoute = require('./routes/training')(Training),
+trainingRoute = require('./routes/training')(Training);
 advisoryServiceRoute = require('./routes/advisoryService')(AdvisoryService);
 
 app.use('/api/session', sessionRouter);

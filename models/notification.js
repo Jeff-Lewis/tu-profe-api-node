@@ -3,7 +3,7 @@ var dynamoose = require('dynamoose'),
 
 var notificationSchema = new Schema({
     id: { type: String, hashKey: true },
-    userId: { type: String },
+    userId: { type: String, required: true },
     title: { type: String },
     text: { type: String },
     type: { type: Number },
