@@ -1,15 +1,16 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
     uuidV4 = require('uuid/v4'),
-    dynamoose = require('dynamoose')
-multer = require('multer');
+    dynamoose = require('dynamoose'),
+    multer = require('multer');
 
 var School = require('./models/school'),
     Course = require('./models/course'),
     Profession = require('./models/profession'),
     Teacher = require('./models/teacher'),
     Interview = require('./models/interview'),
-    Training = require('./models/training');
+    Training = require('./models/training'),
+    Notification = require('./models/notification');
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -37,6 +38,7 @@ professionRouter = require('./routes/profession')(Profession);
 teacherRouter = require('./routes/teacher')(Teacher);
 interviewRouter = require('./routes/interview')(Interview);
 trainingRoute = require('./routes/training')(Training);
+notificationRoute = require('./routes/notification')(Notification);
 
 app.use('/api/session', sessionRouter);
 app.use('/api/schools', schoolRouter);
@@ -45,6 +47,7 @@ app.use('/api/professions', professionRouter);
 app.use('/api/teachers', teacherRouter);
 app.use('/api/interviews', interviewRouter);
 app.use('/api/trainings', trainingRoute);
+app.use('/api/notifications', notificationRoute);
 
 app.listen(port, function () {
     console.log('App is running in port: ' + port);
