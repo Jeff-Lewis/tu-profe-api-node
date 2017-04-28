@@ -24,6 +24,17 @@ var routes = Notification => {
                     res.status(500).send(err);
                 });
         });
+        
+    notificationRouter.route('/user/:userId')
+        .get((req,res)=>{
+            NotificationServices.getNotificationsByUserId(req.params.userId)
+                .then(notifications=>{
+                    res.status(200).send(notifications);
+                })
+                .catch(err=>{
+                    res.status(500).send(err);
+                });
+        });
 
     return notificationRouter;
 };

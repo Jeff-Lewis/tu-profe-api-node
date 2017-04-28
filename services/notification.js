@@ -27,4 +27,13 @@ NotificationServices.getNotificationById = notificationId => {
     });
 };
 
+NotificationServices.getNotificationsByUserId = userId => {
+    return new Promise((resolve, reject) => {
+        Notification.scan({userId: {eq: userId} }, function (err, notifications) {
+            if (err) reject(err);
+            else resolve(notifications);
+        });
+    });
+};
+
 module.exports = NotificationServices;
