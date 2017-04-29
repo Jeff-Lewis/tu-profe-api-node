@@ -6,7 +6,7 @@ var studentSchema = new Schema({
     id: { type: String, hashKey: true },
     email: String,
     name: { type: String },
-    lastname: { type: String },
+    lastName: { type: String },
     identification: String,
 
     // Personal Data

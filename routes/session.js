@@ -3,8 +3,9 @@ var Promise = require('promise');
 
 var TeacherService = require('../services/teacher');
 var StudentServices = require('../services/student');
+var AdminServices = require('../services/admin');
 
-var routes = function (Teacher, Student) {
+var routes = function (Teacher, Student, Admin) {
     var sessionRoute = express.Router();
 
     sessionRoute.route('/teacher/signup')
@@ -41,7 +42,7 @@ var routes = function (Teacher, Student) {
                     res.status(500).send(err);
                 });
         });
-    
+
     sessionRoute.route('/student/login')
         .post(function (req, res) {
             console.log(req.query.username);
@@ -51,6 +52,17 @@ var routes = function (Teacher, Student) {
                 else
                     res.status(200).send(students[0]);
             });
+        });
+
+    sessionRoute.route('/admin/signup')
+        .post((req, res) => {
+            var admin = new Admin(req.body);
+            AdminServices.createAdmin(admin)
+                .then(newAdmin => {
+                    res.status(201).send(admin);
+                }, err => {
+                    res.status(500).send(err);
+                });
         });
 
     return sessionRoute;

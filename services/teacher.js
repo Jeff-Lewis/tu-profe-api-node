@@ -46,10 +46,6 @@ TeacherServices.getTeacherByEmail = email => {
     });
 };
 
-TeacherServices.getTeachers = function () {
-
-};
-
 TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
     console.info(teacherId, teacherUpdated)
     return TeacherServices.getTeacherById(teacherId)
