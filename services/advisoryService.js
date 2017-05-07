@@ -46,13 +46,17 @@ AdvisoryServiceServices.validate = advisoryService => {
             reject('Las sesiones no pueden estar vacias.');
         }
 
-        advisoryService.sessionsExtended.forEach(session => {
+        advisoryService.sessionsExtended.forEach((session, index) => {
+            var startTime = session.startTime.split(':');
+            console.log(parseInt(startTime[0]) <= 8);
             if (new Date(session.startDate) < today) {
                 reject('La fecha de inicio de una sesión no puede ser menor a hoy');
+            } else if (!(6 <= parseInt(startTime[0]) && parseInt(startTime[0]) <= 20)) {
+                reject(`La hora de inicio de la sesión ${index + 1} no se encuentra en los rangos permitidos`);
             }
         });
 
-        if (advisoryService.type === AdvisoryServiceType.TUTOR.value) {            
+        if (advisoryService.type === AdvisoryServiceType.TUTOR.value) {
             if (!(1 <= advisoryService.months && advisoryService.months <= 12)) {
                 reject('La cantidad de meses debe estar entre 1 y 12.');
             } else if (!(2 <= advisoryService.sessionsPerWeek && advisoryService.sessionsPerWeek <= 5)) {
