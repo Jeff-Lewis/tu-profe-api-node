@@ -7,7 +7,7 @@ var routes = AdvisoryService => {
 
     advisoryServiceRouter.route('/')
         .post((req, res) => {
-            var advisoryService = req.body;            
+            var advisoryService = req.body;
             AdvisoryServiceServices.createAdvisoryService(advisoryService)
                 .then(advisoryService => {
                     res.status(200).send(advisoryService);
@@ -19,8 +19,20 @@ var routes = AdvisoryService => {
 
     advisoryServiceRouter.route('/calculate')
         .post((req, res) => {
-            var advisoryService = req.body;            
+            var advisoryService = req.body;
             AdvisoryServiceServices.calculate(advisoryService)
+                .then(advisoryService => {
+                    res.status(200).send(advisoryService);
+                })
+                .catch(err => {
+                    res.status(500).send(err);
+                });
+        });
+
+    advisoryServiceRouter.route('/validate')
+        .post((req, res) => {
+            var advisoryService = req.body;
+            AdvisoryServiceServices.validate(advisoryService)
                 .then(advisoryService => {
                     res.status(200).send(advisoryService);
                 })
