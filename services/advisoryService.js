@@ -46,18 +46,18 @@ AdvisoryServiceServices.validate = advisoryService => {
             reject('Las sesiones no pueden estar vacias.');
         }
 
-        advisoryService.sessionsExtended.forEach(session => {            
-            if (new Date(session.startDate) <= today) {
+        advisoryService.sessionsExtended.forEach(session => {
+            if (new Date(session.startDate) < today) {
                 reject('La fecha de inicio de una sesión no puede ser menor a hoy');
             }
         });
 
-        if (advisoryService.type === AdvisoryServiceType.TUTOR.value) {
+        if (advisoryService.type === AdvisoryServiceType.TUTOR.value) {            
             if (!(1 <= advisoryService.months && advisoryService.months <= 12)) {
                 reject('La cantidad de meses debe estar entre 1 y 12.');
             } else if (!(2 <= advisoryService.sessionsPerWeek && advisoryService.sessionsPerWeek <= 5)) {
                 reject('La cantidad de sesiones por semana debe estar entre 2 y 5.');
-            } else if (new Date(advisoryService.startDate) <= today) {
+            } else if (new Date(advisoryService.startDate) < today) {
                 reject('La fecha de inicio del servicio no puede ser menor a hoy');
             }
         } else if (advisoryService.type === AdvisoryServiceType.SPECIFIC_TOPIC.value) {
