@@ -1,7 +1,7 @@
 var dynamoose = require('dynamoose'),
     Schema = dynamoose.Schema;
 
-var sessionServiceSchema = new Schema({
+var advisorySessionSchema = new Schema({
     id: { type: String, hashKey: true },
     advisoryService: { type: String },
     date: { type: Date },
@@ -10,4 +10,4 @@ var sessionServiceSchema = new Schema({
     dayOfWeek: { type: Number }
 });
 
-module.exports = dynamoose.model('SessionService', sessionServiceSchema);
+module.exports = dynamoose.model('AdvisorySession', advisorySessionSchema);

@@ -9,7 +9,7 @@ var advisoryService = new Schema({
     startDate: { type: Date, default: 1 },
     numberHours: { type: Number, default: 2 },
     courses: { type: [String], default: [] },
-    sessions: { type: [String], default: [] },
+    sessions: { type: [Object], default: [] },
     cost: { type: Object },
 
     //Tutor 

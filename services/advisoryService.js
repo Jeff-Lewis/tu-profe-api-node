@@ -7,10 +7,18 @@ var AdvisoryServiceServices = {};
 
 AdvisoryServiceServices.createAdvisoryService = advisoryService => {
     return AdvisoryServiceServices.validate(advisoryService)
-        .then(advisoryService => calculate(advisoryService))
+        .then(advisoryService => AdvisoryServiceServices.calculate(advisoryService))
         .then(advisoryService => {
             return new Promise((resolve, reject) => {
                 advisoryService.id = uuidV4();
+                advisoryService.sessions = advisoryService.sessions.map(session=>{
+                    return {
+                        startDate: session.startDate,
+                        startTime: session.startTime,
+                        duration:session.duration,
+                        dayOfWeek:  new Date(session.startDate).getDay()
+                    };
+                });
                 AdvisoryService.create(advisoryService, function (err, newAdvisoryService) {
                     if (err) reject(err);
                     else resolve(newAdvisoryService);
@@ -21,10 +29,7 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
 
 AdvisoryServiceServices.calculate = advisoryService => {
     return new Promise((resolve, reject) => {
-        var cost = advisoryService.numberStudents *
-            advisoryService.numberHours *
-            advisoryService.course.classification *
-            10000;
+        var cost = 0;
         advisoryService.cost = {
             baseCost: cost
         };
@@ -42,13 +47,12 @@ AdvisoryServiceServices.validate = advisoryService => {
 
         if (!advisoryService.description) {
             reject('La descripción no puede estar vacia.');
-        } else if (advisoryService.sessionsExtended.length <= 0) {
+        } else if (advisoryService.sessions.length <= 0) {
             reject('Las sesiones no pueden estar vacias.');
         }
 
-        advisoryService.sessionsExtended.forEach((session, index) => {
+        advisoryService.sessions.forEach((session, index) => {
             var startTime = session.startTime.split(':');
-            console.log(parseInt(startTime[0]) <= 8);
             if (new Date(session.startDate) < today) {
                 reject('La fecha de inicio de una sesión no puede ser menor a hoy');
             } else if (!(6 <= parseInt(startTime[0]) && parseInt(startTime[0]) <= 20)) {
@@ -69,7 +73,7 @@ AdvisoryServiceServices.validate = advisoryService => {
         } else {
             reject('Tipo de servicio no definido.');
         }
-
+    
         resolve(advisoryService);
     });
 };
