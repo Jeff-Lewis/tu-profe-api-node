@@ -5,18 +5,22 @@ var AdvisoryService = require('../models/advisoryService');
 var AdvisoryServiceType = require('../models/enum/advisoryServiceType');
 var AdvisoryServiceServices = {};
 
+/**
+ * Create advisory Service
+ */
 AdvisoryServiceServices.createAdvisoryService = advisoryService => {
     return AdvisoryServiceServices.validate(advisoryService)
         .then(advisoryService => AdvisoryServiceServices.calculate(advisoryService))
         .then(advisoryService => {
             return new Promise((resolve, reject) => {
                 advisoryService.id = uuidV4();
-                advisoryService.sessions = advisoryService.sessions.map(session=>{
+                advisoryService.sessions = advisoryService.sessions.map((session, index) => {
                     return {
+                        id: index + 1,
                         startDate: session.startDate,
                         startTime: session.startTime,
-                        duration:session.duration,
-                        dayOfWeek:  new Date(session.startDate).getDay()
+                        duration: session.duration,
+                        dayOfWeek: new Date(session.startDate).getDay()
                     };
                 });
                 AdvisoryService.create(advisoryService, function (err, newAdvisoryService) {
@@ -27,6 +31,9 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
         });
 };
 
+/**
+ * Calculate advisory Service cost
+ */
 AdvisoryServiceServices.calculate = advisoryService => {
     return new Promise((resolve, reject) => {
         var cost = 0;
@@ -73,7 +80,7 @@ AdvisoryServiceServices.validate = advisoryService => {
         } else {
             reject('Tipo de servicio no definido.');
         }
-    
+
         resolve(advisoryService);
     });
 };
