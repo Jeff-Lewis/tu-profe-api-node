@@ -2,7 +2,11 @@ var express = require('express'),
     bodyParser = require('body-parser'),
     uuidV4 = require('uuid/v4'),
     dynamoose = require('dynamoose'),
-    multer = require('multer');
+    multer = require('multer'),
+    morgan = require('morgan'),
+    jwt = require('jsonwebtoken');
+
+var config = require('./config');
 
 var School = require('./models/school'),
     Course = require('./models/course'),
@@ -27,6 +31,7 @@ dynamoose.AWS.config.update({
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(morgan('dev'));
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');

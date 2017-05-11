@@ -5,6 +5,7 @@ var studentSchema = new Schema({
     //Account Data
     id: { type: String, hashKey: true },
     email: String,
+    password: String,
     name: { type: String },
     lastName: { type: String },
     identification: String,

@@ -1,6 +1,7 @@
 var express = require('express');
 var Promise = require('promise');
 
+var SessionServices = require('../services/session');
 var TeacherService = require('../services/teacher');
 var StudentServices = require('../services/student');
 var AdminServices = require('../services/admin');
@@ -22,14 +23,11 @@ var routes = function (Teacher, Student, Admin) {
         });
 
     sessionRoute.route('/teacher/login')
-        .post(function (req, res) {
-            console.log(req.query.username);
-            Teacher.scan('email').contains(req.query.username).exec(function (err, teachers) {
-                if (err || teachers === undefined)
-                    res.status(403).send(err);
-                else
-                    res.status(200).send(teachers[0]);
-            });
+        .post(function (req, res) {            
+            TeacherService.getTeacherByEmail(req.query.username)
+                .then(teacher => SessionServices.authenticate(req.query.username, req.query.password, teacher))
+                .then(token => res.status(200).send(token))                
+                .catch(err => res.status(500).send(err));
         });
 
     sessionRoute.route('/student/signup')
