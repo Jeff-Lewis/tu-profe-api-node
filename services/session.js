@@ -4,8 +4,7 @@ var jwt = require('jsonwebtoken');
 
 var SessionServices = {};
 
-SessionServices.authenticate = (username, password, user) => {
-    console.log('here');
+SessionServices.authenticate = (username, password, user) => {    
     return new Promise((resolve, reject) => {
         if (user === null || user === undefined) {
             reject('Autenticación invalida');
@@ -13,12 +12,16 @@ SessionServices.authenticate = (username, password, user) => {
             reject('Autenticación fallida.');
         } else {
             var token = jwt.sign(user, config.secret, {
-                expiresIn: 1440 
+                expiresIn: 1440
             });
             resolve({
                 success: true,
                 message: 'Este token de sesión expirará en 24 horas',
-                token: token
+                token: token,
+                user: {
+                    username: user.email,
+                    userId: user.id
+                }
             });
         }
     });

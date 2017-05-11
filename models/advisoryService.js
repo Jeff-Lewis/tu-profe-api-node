@@ -4,6 +4,7 @@ var dynamoose = require('dynamoose'),
 var advisoryService = new Schema({
     //General
     id: { type: String, hashKey: true },
+    studentId: { type: String, required: true },
     createdAt: { type: Date, default: new Date() },
     description: { type: String },
     numStudents: { type: Number, default: 1 },
