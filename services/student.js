@@ -34,7 +34,7 @@ StudentServices.getStudentByEmail = email => {
     return new Promise((resolve, reject) => {
         Student.scan('email').eq(email).exec((err, students) => {
             if (err) reject(err);
-            else if (students.length <= 0) reject('Ningun profesor fue encontrado');
+            else if (students.length <= 0) reject('Ningun estudiante fue encontrado');
             else resolve(students[0]);
         });
     });

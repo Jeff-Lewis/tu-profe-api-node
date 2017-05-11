@@ -23,10 +23,10 @@ var routes = function (Teacher, Student, Admin) {
         });
 
     sessionRoute.route('/teacher/login')
-        .post(function (req, res) {            
+        .post(function (req, res) {
             TeacherService.getTeacherByEmail(req.query.username)
                 .then(teacher => SessionServices.authenticate(req.query.username, req.query.password, teacher))
-                .then(token => res.status(200).send(token))                
+                .then(token => res.status(200).send(token))
                 .catch(err => res.status(500).send(err));
         });
 
@@ -43,13 +43,10 @@ var routes = function (Teacher, Student, Admin) {
 
     sessionRoute.route('/student/login')
         .post(function (req, res) {
-            console.log(req.query.username);
-            Student.scan('email').contains(req.query.username).exec(function (err, students) {
-                if (err || students === undefined)
-                    res.status(403).send(err);
-                else
-                    res.status(200).send(students[0]);
-            });
+            StudentServices.getStudentByEmail(req.query.username)
+                .then(teacher => SessionServices.authenticate(req.query.username, req.query.password, teacher))
+                .then(token => res.status(200).send(token))
+                .catch(err => res.status(500).send(err));
         });
 
     sessionRoute.route('/admin/signup')
