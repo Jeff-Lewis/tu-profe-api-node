@@ -44,8 +44,10 @@ var routes = AdvisoryService => {
     advisoryServiceRouter.route('/get-by-student/:studentId')
         .get((req, res) => {
             AdvisoryServiceServices.getAllByStudentId(req.params.studentId)                
-                .then(services => req.status(200).send(services))
-                .catch(err => req.status(500).send(err));
+                .then(services => {
+                    res.status(200).send(services);
+                })
+                .catch(err => res.status(500).send(err));
         });
 
     return advisoryServiceRouter;
