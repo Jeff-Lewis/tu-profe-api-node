@@ -23,6 +23,15 @@ var routes = Notification => {
                 .catch(err => {
                     res.status(500).send(err);
                 });
+        })
+        .put((req, res) => {
+            var notification = req.body;
+            NotificationServices.updateNotification(notification.id, notification)
+                .then(notification => {
+                    res.status(200).send(notification);
+                }, err => {
+                    res.status(500).send(err);
+                });
         });
         
     notificationRouter.route('/user/:userId')

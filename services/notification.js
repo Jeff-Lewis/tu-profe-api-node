@@ -16,6 +16,19 @@ NotificationServices.createNotification = notification => {
     });
 };
 
+NotificationServices.updateNotification = (notificationId, notificationUpdated) => {
+    return NotificationServices.getNotificationById(notificationId)
+        .then(notification => {
+            return new Promise((resolve, reject) => {
+                notification = new Notification(notificationUpdated);
+                notification.save(err => {
+                    if (err) { console.log(err); reject(err) }
+                    else { resolve(notification) }
+                });
+            });
+        });
+};
+
 NotificationServices.getNotificationById = notificationId => {
     return new Promise((resolve, reject) => {
         Notification.get({ id: notificationId }, (err, notification) => {
