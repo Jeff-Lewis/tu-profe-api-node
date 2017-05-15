@@ -85,4 +85,16 @@ AdvisoryServiceServices.validate = advisoryService => {
     });
 };
 
+AdvisoryServiceServices.getAllByStudentId = studentId => {
+    return new Promise((resolve, reject) => {
+        AdvisoryService.scan('studentId').eq(studentId).exec((err, services) => {
+            if (err) reject(err);
+            else {
+                console.log(services[0].NewModel);
+                resolve(services);
+            }
+        });
+    });
+};
+
 module.exports = AdvisoryServiceServices;
