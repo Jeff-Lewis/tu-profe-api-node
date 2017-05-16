@@ -29,6 +29,15 @@ NotificationServices.updateNotification = (notificationId, notificationUpdated) 
         });
 };
 
+NotificationServices.deleteNotification = notificationId => {
+    return new Promise((resolve,reject)=>{
+        Notification.delete({id: notificationId}, (err) => {
+            if(err) { return reject(err); }
+            return resolve();
+        });
+    });  
+};
+
 NotificationServices.getNotificationById = notificationId => {
     return new Promise((resolve, reject) => {
         Notification.get({ id: notificationId }, (err, notification) => {
