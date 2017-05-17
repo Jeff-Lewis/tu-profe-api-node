@@ -3,6 +3,8 @@ var Promise = require('promise');
 
 var AdvisoryService = require('../models/advisoryService');
 var AdvisoryServiceType = require('../models/enum/advisoryServiceType');
+
+var NotificationServices = require('../services/notification');
 var AdvisoryServiceServices = {};
 
 /**
@@ -25,7 +27,10 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                 });
                 AdvisoryService.create(advisoryService, function (err, newAdvisoryService) {
                     if (err) reject(err);
-                    else resolve(newAdvisoryService);
+                    else {
+                        AdvisoryServiceServices.sendNotification(newAdvisoryService);
+                        resolve(newAdvisoryService);
+                    }
                 });
             });
         });
@@ -94,6 +99,16 @@ AdvisoryServiceServices.getAllByStudentId = studentId => {
             }
         });
     });
+};
+
+AdvisoryServiceServices.sendNotification = (advisoryService)=>{
+    var notification = {
+        title:"Servicio Creado",
+        text:"Su servicio ha sido creado con éxito",
+        type:2,
+        userId:"2"
+    };  
+    NotificationServices.createNotification(notification);
 };
 
 module.exports = AdvisoryServiceServices;

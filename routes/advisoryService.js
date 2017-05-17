@@ -7,8 +7,7 @@ var routes = AdvisoryService => {
 
     advisoryServiceRouter.route('/')
         .post((req, res) => {
-            var advisoryService = req.body;
-            AdvisoryServiceServices.createAdvisoryService(advisoryService)
+            AdvisoryServiceServices.createAdvisoryService(req.body)
                 .then(advisoryService => {
                     res.status(200).send(advisoryService);
                 })
