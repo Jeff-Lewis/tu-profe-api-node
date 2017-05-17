@@ -32,6 +32,11 @@ dynamoose.AWS.config.update({
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
+app.use((req,res,next)=>{
+    console.log("GOT REQUEST !");
+    console.log(res);
+    next();
+});
 
 app.use(function (req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');

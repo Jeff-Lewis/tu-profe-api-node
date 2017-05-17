@@ -187,7 +187,7 @@ AdvisoryServiceServices.sendNotification = (advisoryService)=>{
         title:"Servicio Creado",
         text:"Su servicio ha sido creado con éxito",
         type:2,
-        userId:"2"
+        userId:advisoryService.studentId
     };  
     NotificationServices.createNotification(notification);
 };
