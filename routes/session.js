@@ -33,7 +33,7 @@ var routes = function (Teacher, Student, Admin) {
     sessionRoute.route('/student/signup')
         .post((req, res) => {
             var student = new Student(req.body);
-            StudentServices.createStudent(student)
+            SessionServices.signUpUser('Student',student)
                 .then(newStudent => {
                     res.status(201).send(student);
                 }, err => {
@@ -44,7 +44,7 @@ var routes = function (Teacher, Student, Admin) {
     sessionRoute.route('/student/login')
         .post(function (req, res) {
             StudentServices.getStudentByEmail(req.query.username)
-                .then(teacher => SessionServices.authenticate(req.query.username, req.query.password, teacher))
+                .then(student => SessionServices.authenticate(req.query.username, req.query.password, student))
                 .then(token => res.status(200).send(token))
                 .catch(err => res.status(500).send(err));
         });

@@ -1,3 +1,6 @@
+var bcrypt = require('bcrypt');
+var Promise = require('promise');
+
 var UtilsServices = {};
     
 function decimalAdjust(type, value, exp) {
@@ -21,6 +24,38 @@ function decimalAdjust(type, value, exp) {
 
 UtilsServices.ceil10 = (value, exp)=> {
     return decimalAdjust('ceil', value, exp);
+};
+
+UtilsServices.crypt = password => {
+  return new Promise((resolve,reject)=>{
+    bcrypt.genSalt(10,(err, salt)=> {
+      if (err){
+        reject(err);
+      }
+      
+      bcrypt.hash(password, salt, (err, hash)=> {
+        if (err) {
+          reject(err);
+        }else{
+          resolve(hash); 
+        }
+      });
+  
+    });
+  });
+};
+
+UtilsServices.comparePassword = (password, userPassword) => {
+  return new Promise((resolve,reject)=>{
+    console.log(password,userPassword);
+    bcrypt.compare(password, userPassword, function(err, isPasswordMatch) {
+      if (err) {
+        reject(err);
+      }else{
+        resolve(isPasswordMatch);
+      }
+    });
+  });
 };
 
 module.exports = UtilsServices;
