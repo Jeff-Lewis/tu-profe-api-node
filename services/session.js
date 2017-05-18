@@ -28,9 +28,6 @@ SessionServices.authenticate = (username, password, user) => {
                 });
             }
         });
-    return new Promise((resolve, reject) => {
-        
-    });
 };
 
 SessionServices.signUpUser = (userType, user) => {

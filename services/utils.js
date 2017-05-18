@@ -47,7 +47,6 @@ UtilsServices.crypt = password => {
 
 UtilsServices.comparePassword = (password, userPassword) => {
   return new Promise((resolve,reject)=>{
-    console.log(password,userPassword);
     bcrypt.compare(password, userPassword, function(err, isPasswordMatch) {
       if (err) {
         reject(err);
