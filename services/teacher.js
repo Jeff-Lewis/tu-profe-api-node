@@ -14,6 +14,7 @@ TeacherServices.createTeacher = teacher => {
     return new Promise((resolve, reject) => {
         teacher.id = uuidV4();
         teacher.acceptGameRules = false;
+        teacher.state = TeacheState.SIGN_UP.value;
         Teacher.create(teacher, function (err, newTeacher) {
             if (err) reject(err);
             else resolve(newTeacher);

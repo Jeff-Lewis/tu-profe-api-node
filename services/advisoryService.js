@@ -3,7 +3,9 @@ var Promise = require('promise');
 
 var AdvisoryService = require('../models/advisoryService');
 var AdvisoryServiceType = require('../models/enum/advisoryServiceType');
+var SessionState = require('../models/enum/sessionState');
 
+var CostConfigServices = require('../services/costConfig');
 var NotificationServices = require('../services/notification');
 var UtilsServices = require('../services/utils');
 var AdvisoryServiceServices = {};
@@ -23,7 +25,8 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                         startDate: session.startDate,
                         startTime: session.startTime,
                         duration: session.duration,
-                        dayOfWeek: new Date(session.startDate).getDay()
+                        dayOfWeek: new Date(session.startDate).getDay(),
+                        state: SessionState.PENDING.value
                     };
                 });
                 AdvisoryService.create(advisoryService, function (err, newAdvisoryService) {
@@ -41,92 +44,58 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
  * Calculate advisory Service cost
  */
 AdvisoryServiceServices.calculate = advisoryService => {
-    return new Promise((resolve, reject) => {
-        
-        var conf = {
-            F:1-0.0299*1.19,
-            G:1.06,
-            E:600*1.19
-        };
-        
-        var factor = (B,C,X)=>{
-            console.log(B,C,X);
-            return B-(C*(X-8)/2);
-        };
-        
-        var epayCo = (V,X) => {
-            return (V*X + conf.E)/conf.F*conf.G;
-        };
-        
-        var specificSmallerThan8 = (A,X) => {
-            return A*X;    
-        };
-        
-        var specificOneStudent = (X,B,C,D) => {
-            var V = factor(B,C,X)/D;
-            console.log(V);
-            return epayCo(V,X);
-        };
-        
-        var specificMoreThanTwoStudents = (X,B,C,D,L,M) => {
-            var V = ((L*X) + M - factor(B,C,X))/D;
-            return epayCo(V,X);
-        };
-        
-        var tutor = (L,X,M,N,O,P,D) => {
-            var V = (L*X + M + (N*X + O)*(P - 1))/D; 
-            return epayCo(V,X);
-        };
-        
+    return new Promise((resolve,reject)=>{
         var total = 0;
+        var h = 0;
+        
+        var costParams = {
+            advisoryServiceType:advisoryService.type,
+            numStudents:advisoryService.numStudents
+        };
+        
+        var costFunction = (L,M,A,D,C,G,F,E,h) => {
+            (((L*h)+M+(A-C*(h-8)/2)/D)/F*2+E)/F*G/2;
+        };
         
         switch (advisoryService.type) {
             case 1:
-                conf.L=-127.2;
-                conf.M=4997.4;
-                conf.N=-416.93;
-                conf.O=5639.2;
-                conf.D=0.8;
-                var x = advisoryService.sessionsPerWeek * 2 * 4;
-                total = tutor(conf.L,x,conf.M,conf.N,conf.O,advisoryService.numStudents,conf.D);
                 break;
             case 2:
-                var costFunction = specificMoreThanTwoStudents;
-                var X = advisoryService.timePerSession * advisoryService.numSessions;
-                switch (advisoryService.numStudents) {
-                    case 1:
-                        conf.A = 17490;
-                        conf.B = 16366.2530739996;	
-                        conf.C = 209.823757358969;	
-                        conf.D = 0.7
-                        costFunction = specificOneStudent;
-                        break;
-                    case 2:
-                        conf.A = 25440;
-                        break;
-                    case 3:
-                        conf.A = 33390;
-                        break;
-                    case 4:
-                        conf.A = 41340;
-                        break;
-                    default:
-                        reject('No es posible calcular un valor para este número de estudiantes.');
-                        break;
-                }
-                if(X < 8){
-                    total = specificSmallerThan8(conf.A, X);
-                }else{
-                    total = costFunction(X,conf.B,conf.C,conf.D,conf.L,conf.M);
+                h = advisoryService.timePerSession * advisoryService.numSessions;
+                costParams.courseType = advisoryService.course.difficulty;
+                if(advisoryService.course.difficulty === 'Regular'){
+                    if(h<8){
+                        costParams.greaterThanLimit = 0;
+                    }else{
+                        costParams.greaterThanLimit = 1;
+                    }
+                }else if (advisoryService.course.difficulty === 'Especializado'){
+                    if(h<8){
+                        costParams.greaterThanLimit = 0;
+                    }else{
+                        costParams.greaterThanLimit = 1;
+                    }
                 }
                 break;
             default:
-            reject('No es posible calcular el valor a este tipo de servicio.');
+                reject('No es posible calcular el valor a este tipo de servicio.');
                 break;
         }
-        advisoryService.total=UtilsServices.ceil10(total,2);
-        return resolve(advisoryService);
-        
+        CostConfigServices.getCostConfig(costParams.advisoryServiceType,costParams.courseType,costParams.greaterThanLimit,costParams.numStudents)
+            .then(costConfig => {
+                console.log(costConfig);
+                costConfig = costConfig.config;
+                costConfig.C=209.823757358969;
+                costConfig.D=0.7;
+                costConfig.E=600*1.19;
+                costConfig.F=1-0.0299*1.19;
+                costConfig.G=1.06;
+                console.log(costConfig);
+                total = costFunction(costConfig.L,costConfig.M,costConfig.A,costConfig.D,costConfig.C,costConfig.G,costConfig.F,costConfig.E,h)
+                console.log('TOTALCOST=',total);
+                advisoryService.total=UtilsServices.ceil10(total,2);
+                resolve(advisoryService);
+            });
     });
 };
 
@@ -162,7 +131,9 @@ AdvisoryServiceServices.validate = advisoryService => {
                 reject('La fecha de inicio del servicio no puede ser menor a hoy');
             }
         } else if (advisoryService.type === AdvisoryServiceType.SPECIFIC_TOPIC.value) {
-
+            if(advisoryService.course === undefined){
+                reject('Un servicio especializado debe tener por lo menos una materia asignada.');
+            }
         } else {
             reject('Tipo de servicio no definido.');
         }

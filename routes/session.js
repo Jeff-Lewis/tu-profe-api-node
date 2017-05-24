@@ -12,14 +12,12 @@ var routes = function (Teacher, Student, Admin) {
     sessionRoute.route('/teacher/signup')
         .post((req, res) => {
             var teacher = new Teacher(req.body);
-            var newTeacher = TeacherService.createTeacher(teacher)
+            SessionServices.signUpUser('Teacher',teacher)
                 .then(newTeacher => {
-                    return newTeacher;
+                    res.status(201).send(teacher);
                 }, err => {
                     res.status(500).send(err);
                 });
-            res.status(201).send(teacher);
-
         });
 
     sessionRoute.route('/teacher/login')

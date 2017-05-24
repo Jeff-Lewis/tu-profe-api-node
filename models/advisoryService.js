@@ -13,10 +13,14 @@ var advisoryService = new Schema({
     courses: { type: [String], default: [] },
     sessions: { type: [Object], default: [] },
     cost: { type: Object },
+    paid: {type:Boolean, required: true, default:true},
 
     //Tutor 
     months: { type: Number, default: 1 },
-    sessionsPerWeek: { type: Number, default: 1 }
+    sessionsPerWeek: { type: Number, default: 1 },
+    
+    //Special
+    course: { type:Object}
 });
 
 module.exports = dynamoose.model('AdvisoryService', advisoryService);

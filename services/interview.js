@@ -46,7 +46,7 @@ InterviewServices.updateInterview = (interviewId, interviewUpdated) => {
             });
         });
 };
-/*
+
 InterviewServices.takePlace = (interviewId, teacherId) => {
     var teacherBackUp, interviewBackUp;
 
@@ -54,8 +54,10 @@ InterviewServices.takePlace = (interviewId, teacherId) => {
         InterviewServices.getInterviewById(interviewId),
         TeacherService.getTeacherById(teacherId)
     ])
-        .then(([interview, teacher]) => {
-
+        .then(values => {
+            var interview = values[0];
+            var teacher = values[1];
+            
             if (interview.interviewed.length >= interview.capacity) {
                 return Promise.reject('Entrevista llena');
             } else if (interview.interviewed.indexOf(teacherId) > -1) {
@@ -84,5 +86,5 @@ InterviewServices.takePlace = (interviewId, teacherId) => {
             ]);
         });
 };
-*/
+
 module.exports = InterviewServices;
