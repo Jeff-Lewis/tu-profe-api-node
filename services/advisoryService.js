@@ -45,7 +45,7 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
  */
 AdvisoryServiceServices.calculate = advisoryService => {
     return new Promise((resolve,reject)=>{
-        var total = 0;
+        var cost = {};
         var h = 0;
         
         var costParams = {
@@ -53,49 +53,64 @@ AdvisoryServiceServices.calculate = advisoryService => {
             numStudents:advisoryService.numStudents
         };
         
-        var costFunction = (L,M,A,D,C,G,F,E,h) => {
-            (((L*h)+M+(A-C*(h-8)/2)/D)/F*2+E)/F*G/2;
+        var tutorFunction = (L,M,N,D,O,G,F,E,h) => {
+            console.log(L,M,N,D,O,G,F,E,h);
+            return ((L*h+M+(N*h+O)*(advisoryService.numStudents-1))/D*h+E)/F*G*4  
         };
         
-        switch (advisoryService.type) {
-            case 1:
-                break;
-            case 2:
-                h = advisoryService.timePerSession * advisoryService.numSessions;
-                costParams.courseType = advisoryService.course.difficulty;
-                if(advisoryService.course.difficulty === 'Regular'){
-                    if(h<8){
-                        costParams.greaterThanLimit = 0;
-                    }else{
-                        costParams.greaterThanLimit = 1;
-                    }
-                }else if (advisoryService.course.difficulty === 'Especializado'){
-                    if(h<8){
-                        costParams.greaterThanLimit = 0;
-                    }else{
-                        costParams.greaterThanLimit = 1;
-                    }
+        var costFunction = (L,M,A,D,C,G,F,E,h) => {
+            console.log(L,M,A,D,C,G,F,E,h);
+            return ((L*h+M+(A-C*(h-8)/2)/D)*2+E)/F*G/2;
+        };
+        
+        if(advisoryService.type === 1){
+            CostConfigServices.getCostConfigById('eb1f04cd-5991-4350-b050-4a435f516b47')
+                .then(costConfig=>{
+                    costConfig = costConfig.config;
+                    costConfig.E=600*1.19;
+                    costConfig.F=1-0.0299*1.19;
+                    h = 2 * advisoryService.sessionsPerWeek;
+                    cost.costPerMonth = tutorFunction(costConfig.L,costConfig.M,costConfig.N,costConfig.D,costConfig.O,costConfig.G,costConfig.F,costConfig.E,h)
+                    cost.costPerMonth=UtilsServices.ceil10(cost.costPerMonth,2);
+                    cost.total = cost.costPerMonth*advisoryService.months;
+                    console.log(cost);
+                    advisoryService.cost = cost;
+                    resolve(advisoryService);
+                });
+        }else if (advisoryService.type===2){
+            h = advisoryService.timePerSession * advisoryService.numSessions;
+            costParams.courseType = advisoryService.course.difficulty;
+            if(advisoryService.course.difficulty === 'Regular'){
+                if(h<8){
+                    costParams.greaterThanLimit = 0;
+                }else{
+                    costParams.greaterThanLimit = 1;
                 }
-                break;
-            default:
-                reject('No es posible calcular el valor a este tipo de servicio.');
-                break;
+            }else if (advisoryService.course.difficulty === 'Especializado'){
+                if(h<8){
+                    costParams.greaterThanLimit = 0;
+                }else{
+                    costParams.greaterThanLimit = 1;
+                }
+            }
+            
+            CostConfigServices.getCostConfig(costParams.advisoryServiceType,costParams.courseType,costParams.greaterThanLimit,costParams.numStudents)
+                .then(costConfig => {
+                    costConfig = costConfig.config;
+                    costConfig.E=600*1.19;
+                    costConfig.F=1-0.0299*1.19;
+                    
+                    cost.costPerHour = costFunction(costConfig.L,costConfig.M,costConfig.A,costConfig.D,costConfig.C,costConfig.G,costConfig.F,costConfig.E,h)
+                    cost.costPerHour=UtilsServices.ceil10(cost.costPerHour,2);
+                    cost.total = cost.costPerHour*h;
+                    console.log(cost);
+                    advisoryService.cost = cost;
+                    resolve(advisoryService);
+                });
+        }else{
+            reject('No es posible calcular el valor a este tipo de servicio.');
         }
-        CostConfigServices.getCostConfig(costParams.advisoryServiceType,costParams.courseType,costParams.greaterThanLimit,costParams.numStudents)
-            .then(costConfig => {
-                console.log(costConfig);
-                costConfig = costConfig.config;
-                costConfig.C=209.823757358969;
-                costConfig.D=0.7;
-                costConfig.E=600*1.19;
-                costConfig.F=1-0.0299*1.19;
-                costConfig.G=1.06;
-                console.log(costConfig);
-                total = costFunction(costConfig.L,costConfig.M,costConfig.A,costConfig.D,costConfig.C,costConfig.G,costConfig.F,costConfig.E,h)
-                console.log('TOTALCOST=',total);
-                advisoryService.total=UtilsServices.ceil10(total,2);
-                resolve(advisoryService);
-            });
+        
     });
 };
 
