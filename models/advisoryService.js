@@ -13,7 +13,7 @@ var advisoryService = new Schema({
     courses: { type: [String], default: [] },
     sessions: { type: [Object], default: [] },
     cost: { type: Object },
-    paid: {type:Boolean, required: true, default:true},
+    paid: {type:Boolean, required: true, default:false},
 
     //Tutor 
     months: { type: Number, default: 1 },
