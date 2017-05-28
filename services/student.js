@@ -2,6 +2,7 @@ var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
 
 var Student = require('../models/student');
+var S3Services = require('../services/s3');
 
 var StudentServices = {};
 
@@ -52,6 +53,16 @@ StudentServices.updateStudent = (studentId, studentUpdated) => {
                 });
             });
         });
+};
+
+StudentServices.updatePhoto = (studentId, photo) => {
+    var bucketName = 'tu-profe/students/profile-photo';
+    var key = studentId + '.png';
+    var file = photo;
+
+    console.log(studentId, photo);
+    return StudentServices.getStudentById(studentId)
+        .then(student => S3Services.uploadFile(bucketName, key, file));        
 };
 
 module.exports = StudentServices;
