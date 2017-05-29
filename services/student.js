@@ -41,8 +41,7 @@ StudentServices.getStudentByEmail = email => {
     });
 };
 
-StudentServices.updateStudent = (studentId, studentUpdated) => {
-    console.info(studentId, studentUpdated)
+StudentServices.updateStudent = (studentId, studentUpdated) => {    
     return StudentServices.getStudentById(studentId)
         .then(student => {
             return new Promise((resolve, reject) => {
@@ -60,7 +59,6 @@ StudentServices.updatePhoto = (studentId, photo) => {
     var key = studentId + '.png';
     var file = photo;
 
-    console.log(studentId, photo);
     return StudentServices.getStudentById(studentId)
         .then(student => S3Services.uploadFile(bucketName, key, file));        
 };

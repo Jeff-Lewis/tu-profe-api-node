@@ -4,7 +4,7 @@ var express = require('express'),
 
 var StudentService = require('../services/student');
 
-var upload = multer({ dest: '..uploads/' })
+var upload = multer({ dest: '..uploads/' });
 
 var routes = function (Student) {
     var studentRouter = express.Router();
@@ -68,7 +68,6 @@ var routes = function (Student) {
                 res.status(200).send(data);
             })
             .catch(err => {
-                console.log(err);
                 res.status(500).send(err);
             });
     });
