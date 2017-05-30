@@ -51,7 +51,9 @@ var teacherSchema = new Schema({
     },
 
     //Auxiliar Variables
-    acceptGameRules: { type: Boolean, default: false }
+    acceptGameRules: { type: Boolean, default: false },
+    validData: { type: Boolean, default: false },
+    cultureForm: { type: Boolean, default: false },
 
 });
 

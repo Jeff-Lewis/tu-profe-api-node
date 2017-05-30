@@ -47,6 +47,17 @@ TeacherServices.getTeacherByEmail = email => {
     });
 };
 
+TeacherServices.getLinkUpTeachers = () => {
+    return new Promise((resolve, reject) => {
+        Teacher.scan('state').between(0, 3).exec((err, teachers) => {
+            console.log(teachers);
+            if (err) reject(err);
+            else if (teachers.length <= 0) reject('Ningun profesor fue encontrado');
+            else resolve(teachers);
+        });
+    });
+};
+
 TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
     console.info(teacherId, teacherUpdated)
     return TeacherServices.getTeacherById(teacherId)
@@ -88,6 +99,15 @@ TeacherServices.takeExam = (teacherId, exam) => {
     return TeacherServices.getTeacherById(teacherId)
         .then(teacher => {
             teacher.exam = exam;
+            return Promise.resolve(teacher);
+        })
+        .then(teacher => TeacherServices.updateTeacher(teacherId, teacher));
+};
+
+TeacherServices.changeValidData = teacherId => {
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => {
+            teacher.validData = teacher.validData ? !teacher.validData : true;
             return Promise.resolve(teacher);
         })
         .then(teacher => TeacherServices.updateTeacher(teacherId, teacher));
