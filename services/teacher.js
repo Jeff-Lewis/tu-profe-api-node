@@ -122,4 +122,13 @@ TeacherServices.activateAccount = (teacherId, exam) => {
         .then(teacher => TeacherServices.updateTeacher(teacherId, teacher));
 };
 
+TeacherServices.updatePhoto = (teacherId, photo) => {
+    var bucketName = 'tu-profe/teachers/profile-photo';
+    var key = teacherId + '.png';
+    var file = photo;
+
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => S3Services.uploadFile(bucketName, key, file));        
+};
+
 module.exports = TeacherServices;

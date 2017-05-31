@@ -103,6 +103,20 @@ var routes = function (Teacher) {
             });
     });
 
+    /**
+     * POST - Update teacher photo profile.
+     */
+    teacherRouter.post('/photo/:teacherId', upload.single('file'), (req, res) => {
+        var file = req.file;
+        TeacherService.updatePhoto(req.params.teacherId, file)
+            .then(data => {
+                res.status(200).send(data);
+            })
+            .catch(err => {
+                res.status(500).send(err);
+            });
+    });
+
     return teacherRouter;
 };
 
