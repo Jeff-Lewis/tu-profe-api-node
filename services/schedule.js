@@ -43,6 +43,24 @@ ScheduleServices.updateSchedule = (scheduleId, scheduleUpdated) => {
         });
 };
 
+ScheduleServices.deleteSection=(scheduleId, oldSection)=>{
+    ScheduleServices.getScheduleById(scheduleId)
+        .then(schedule=>{
+            var day = schedule.days.find(day => { return day.day === oldSection.day; });
+            var section = day.sections.find(section=>{return section.startTime === oldSection.startTime && section.endTime === section.endTime});
+            
+            if(section === undefined){
+                return Promise.reject('La sección no ha sido encontrada.');
+            }
+            
+            var indexSection = day.sections.indexOf(section);
+            var indexDay = schedule.days.indexOf(day);
+            day.sections.splice(indexSection,1);
+            schedule.days[indexDay] = day;
+            return ScheduleServices.updateSchedule(scheduleId, schedule);
+        });  
+};
+
 ScheduleServices.addSection = (scheduleId, newSection) => {
     return ScheduleServices.getScheduleById(scheduleId)
         .then(schedule => {
