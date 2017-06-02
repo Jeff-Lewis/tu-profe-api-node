@@ -12,6 +12,7 @@ var School = require('./models/school'),
     Course = require('./models/course'),
     Profession = require('./models/profession'),
     Teacher = require('./models/teacher'),
+    Schedule = require('./models/schedule'),
     Student = require('./models/student'),
     Student = require('./models/student'),
     Admin = require('./models/admin'),
@@ -46,6 +47,7 @@ schoolRouter = require('./routes/school')(School);
 courseRouter = require('./routes/course')(Course);
 professionRouter = require('./routes/profession')(Profession);
 teacherRouter = require('./routes/teacher')(Teacher);
+scheduleRouter = require('./routes/schedule')(Schedule);
 studentRouter = require('./routes/student')(Student);
 adminRouter = require('./routes/admin')(Admin);
 interviewRouter = require('./routes/interview')(Interview);
@@ -58,6 +60,7 @@ app.use('/api/schools', schoolRouter);
 app.use('/api/courses', courseRouter);
 app.use('/api/professions', professionRouter);
 app.use('/api/teachers', teacherRouter);
+app.use('/api/schedules', scheduleRouter);
 app.use('/api/students', studentRouter);
 app.use('/api/admins', adminRouter);
 app.use('/api/interviews', interviewRouter);
