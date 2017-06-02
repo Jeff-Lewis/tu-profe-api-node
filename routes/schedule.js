@@ -5,16 +5,20 @@ var ScheduleServices = require('../services/schedule');
 var routes = function (Schedule) {
     var scheduleRouter = express.Router();
 
+    scheduleRouter.route('/:id')
+        .get((req, res) => {
+            ScheduleServices.getScheduleById(req.params.id)
+                .then(schedule => res.status(200).send(schedule))
+                .catch(err => res.status(500).send(err));
+        });
+
     scheduleRouter.route('/:scheduleId/sections')
-        .post(function (req, res) {
+        .post((req, res) => {
             var scheduleId = req.params.scheduleId;
             var section = req.body;
             ScheduleServices.addSection(scheduleId, section)
                 .then(schedule => res.status(200).send(schedule))
-                .catch(err => {
-                    console.log(err);
-                    res.status(500).send(err);
-                });
+                .catch(err => res.status(500).send(err));
         });
 
 
