@@ -23,9 +23,10 @@ var routes = function (Schedule) {
         .delete((req,res)=>{
             var scheduleId = req.params.scheduleId;
             var section = req.body;
+            console.log(scheduleId, section);
             ScheduleServices.deleteSection(scheduleId, section)
                 .then(schedule => res.status(200).send(schedule))
-                .catch(err => res.status(500).send(err));
+                .catch(err => console.log(err));//res.status(500).send(err));
         });
 
 

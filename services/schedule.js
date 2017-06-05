@@ -44,10 +44,10 @@ ScheduleServices.updateSchedule = (scheduleId, scheduleUpdated) => {
 };
 
 ScheduleServices.deleteSection=(scheduleId, oldSection)=>{
-    ScheduleServices.getScheduleById(scheduleId)
+    return ScheduleServices.getScheduleById(scheduleId)
         .then(schedule=>{
             var day = schedule.days.find(day => { return day.day === oldSection.day; });
-            var section = day.sections.find(section=>{return section.startTime === oldSection.startTime && section.endTime === section.endTime});
+            var section = day.sections.find(section=>{return section.id === oldSection.id});
             
             if(section === undefined){
                 return Promise.reject('La sección no ha sido encontrada.');
@@ -66,7 +66,7 @@ ScheduleServices.addSection = (scheduleId, newSection) => {
         .then(schedule => {
             if (newSection.endTime - newSection.startTime < 200) {
                 return Promise.reject('Una sección de horario no puede ser menor a 2 horas');
-            } else if (0 >= newSection.day || newSection.day >= 8) {
+            } else if (-1 >= newSection.day || newSection.day >= 7) {
                 return Promise.reject('La sección no pertenece a un día invalido');
             }
 
@@ -81,6 +81,7 @@ ScheduleServices.addSection = (scheduleId, newSection) => {
             }
 
             var index = schedule.days.indexOf(day);
+            newSection.id = uuidV4();
             day.sections.push(newSection);
             schedule.days[index] = day;
 
