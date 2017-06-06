@@ -1,5 +1,6 @@
 var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
+var moment = require('moment');
 
 var AdvisoryService = require('../models/advisoryService');
 var AdvisoryServiceType = require('../models/enum/advisoryServiceType');
@@ -8,6 +9,7 @@ var SessionState = require('../models/enum/sessionState');
 var CostConfigServices = require('../services/costConfig');
 var NotificationServices = require('../services/notification');
 var UtilsServices = require('../services/utils');
+var ScheduleServices = require('../services/schedule')
 var S3Services = require('../services/s3');
 var AdvisoryServiceServices = {};
 
@@ -22,10 +24,18 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                 advisoryService.id = uuidV4();
                 advisoryService.paid = false;
                 advisoryService.sessions = advisoryService.sessions.map((session, index) => {
+                    var startTime = session.startTime.split(':');
+                    var startDate = moment(session.startDate);
+                    startDate.set({ hour: parseInt(startTime[0]), minute: parseInt(startTime[1]) });
+
+                    var endDate = moment(startDate);
+                    endDate.add(session.duration, 'm');
+                    
                     return {
                         id: index + 1,
                         startDate: session.startDate,
                         startTime: session.startTime,
+                        endTime:endDate.format('HH:mm'),
                         duration: session.duration,
                         dayOfWeek: new Date(session.startDate).getDay(),
                         state: SessionState.PENDING.value
@@ -56,6 +66,9 @@ AdvisoryServiceServices.getAdvisoryServiceById = advisoryServiceId => {
     });
 };
 
+/**
+ * Update advisory Service
+ */
 AdvisoryServiceServices.updateAdvisoryService = (advisoryServiceId, advisoryServiceUpdated) => {
     return AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId)
         .then(advisoryService => {
@@ -85,12 +98,10 @@ AdvisoryServiceServices.calculate = advisoryService => {
                 };
 
                 var tutorFunction = (L, M, N, D, O, G, F, E, h) => {
-                    console.log(L, M, N, D, O, G, F, E, h);
                     return ((L * h + M + (N * h + O) * (advisoryService.numStudents - 1)) / D * h + E) / F * G * 4
                 };
 
                 var costFunction = (L, M, A, D, C, G, F, E, h) => {
-                    console.log(L, M, A, D, C, G, F, E, h);
                     return ((L * h + M + (A - C * (h - 8) / 2) / D) * 2 + E) / F * G / 2;
                 };
 
@@ -104,7 +115,7 @@ AdvisoryServiceServices.calculate = advisoryService => {
                             cost.costPerMonth = tutorFunction(costConfig.L, costConfig.M, costConfig.N, costConfig.D, costConfig.O, costConfig.G, costConfig.F, costConfig.E, h)
                             cost.costPerMonth = UtilsServices.ceil10(cost.costPerMonth, 2);
                             cost.total = cost.costPerMonth * advisoryService.months;
-                            console.log(cost);
+                            
                             advisoryService.cost = cost;
                             resolve(advisoryService);
                         });
@@ -134,7 +145,7 @@ AdvisoryServiceServices.calculate = advisoryService => {
                             cost.costPerHour = costFunction(costConfig.L, costConfig.M, costConfig.A, costConfig.D, costConfig.C, costConfig.G, costConfig.F, costConfig.E, h)
                             cost.costPerHour = UtilsServices.ceil10(cost.costPerHour, 2);
                             cost.total = cost.costPerHour * h;
-                            console.log(cost);
+                            
                             advisoryService.cost = cost;
                             resolve(advisoryService);
                         });
@@ -211,7 +222,6 @@ AdvisoryServiceServices.sendNotification = (advisoryService) => {
 };
 
 AdvisoryServiceServices.uploadFile = (advisoryServiceId, file) => {
-    console.log(advisoryServiceId, file);
     var bucketName = 'tu-profe/advisory-services/' + advisoryServiceId;
     var key = uuidV4() + '.' + file.originalname.split('.').pop();
     
@@ -225,10 +235,35 @@ AdvisoryServiceServices.uploadFile = (advisoryServiceId, file) => {
                 return Promise.resolve(advisoryService);
             }
         })
-        .then(advisoryService => {
-            console.log(advisoryService);
-            AdvisoryServiceServices.updateAdvisoryService(advisoryServiceId, advisoryService)
-        });
+        .then(advisoryService => {AdvisoryServiceServices.updateAdvisoryService(advisoryServiceId, advisoryService)});
+};
+
+AdvisoryServiceServices.matchTeacher = (advisoryServiceId, scheduleId) => {
+    return Promise.all([
+            AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
+            ScheduleServices.getScheduleById(scheduleId)
+        ])
+            .then(values=>{
+                var advisoryService = values[0];
+                var schedule = values[1];
+                var result = {};
+                
+                var sessions = advisoryService.sessions.map(session=>{
+                    var sections = schedule.days.find(day => {return day.day === session.dayOfWeek; }).sections;
+                    session.existsSchedule = sections.some(section=>{
+                        var startTime = parseInt(session.startTime.replace(':',''));
+                        var endTime = parseInt(session.endTime.replace(':',''));
+                        return startTime >= section.startTime && endTime <= section.endTime;
+                    });
+                    return session;
+                });
+                
+                result.matchSessions = sessions.filter(session=>{return session.existsSchedule;}).length;
+                result.percentageMatchSessions = result.matchSessions/sessions.length;
+                
+                return Promise.resolve(result);
+                
+            });
 };
 
 module.exports = AdvisoryServiceServices;
