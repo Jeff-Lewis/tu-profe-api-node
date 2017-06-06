@@ -8,6 +8,13 @@ var upload = multer({ dest: '..uploads/' });
 var routes = AdvisoryService => {
     var advisoryServiceRouter = express.Router();
 
+    advisoryServiceRouter.route('/:advisoryServiceId')
+        .get((req, res) => {
+            AdvisoryServiceServices.getAdvisoryServiceById(req.params.advisoryServiceId)
+                .then(advisoryService => res.status(200).send(advisoryService))
+                .catch(err=>res.status(500).send(err));
+        });
+
     advisoryServiceRouter.route('/')
         /**
          * POST - Create advisory Service.
