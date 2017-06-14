@@ -30,12 +30,12 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
 
                     var endDate = moment(startDate);
                     endDate.add(session.duration, 'm');
-                    
+
                     return {
                         id: index + 1,
                         startDate: session.startDate,
                         startTime: session.startTime,
-                        endTime:endDate.format('HH:mm'),
+                        endTime: endDate.format('HH:mm'),
                         duration: session.duration,
                         dayOfWeek: new Date(session.startDate).getDay(),
                         state: SessionState.PENDING.value
@@ -67,13 +67,26 @@ AdvisoryServiceServices.getAdvisoryServiceById = advisoryServiceId => {
 };
 
 /**
+ * Get multiple Advisry Services that match with the params
+ */
+AdvisoryServiceServices.filterByParams = params => {
+    console.log(params);
+    return new Promise((resolve, reject) => {
+        AdvisoryService.scan(params, function (err, advisoryServices) {
+            if (err) reject(err);
+            else resolve(advisoryServices);
+        });
+    });
+};
+
+/**
  * Update advisory Service
  */
 AdvisoryServiceServices.updateAdvisoryService = (advisoryServiceId, advisoryServiceUpdated) => {
     return AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId)
         .then(advisoryService => {
             return new Promise((resolve, reject) => {
-                advisoryService = new AdvisoryService(advisoryServiceUpdated);                
+                advisoryService = new AdvisoryService(advisoryServiceUpdated);
                 advisoryService.save(err => {
                     if (err) { reject(err) }
                     else { resolve(advisoryService) }
@@ -115,7 +128,7 @@ AdvisoryServiceServices.calculate = advisoryService => {
                             cost.costPerMonth = tutorFunction(costConfig.L, costConfig.M, costConfig.N, costConfig.D, costConfig.O, costConfig.G, costConfig.F, costConfig.E, h)
                             cost.costPerMonth = UtilsServices.ceil10(cost.costPerMonth, 2);
                             cost.total = cost.costPerMonth * advisoryService.months;
-                            
+
                             advisoryService.cost = cost;
                             resolve(advisoryService);
                         });
@@ -145,7 +158,7 @@ AdvisoryServiceServices.calculate = advisoryService => {
                             cost.costPerHour = costFunction(costConfig.L, costConfig.M, costConfig.A, costConfig.D, costConfig.C, costConfig.G, costConfig.F, costConfig.E, h)
                             cost.costPerHour = UtilsServices.ceil10(cost.costPerHour, 2);
                             cost.total = cost.costPerHour * h;
-                            
+
                             advisoryService.cost = cost;
                             resolve(advisoryService);
                         });
@@ -224,10 +237,10 @@ AdvisoryServiceServices.sendNotification = (advisoryService) => {
 AdvisoryServiceServices.uploadFile = (advisoryServiceId, file) => {
     var bucketName = 'tu-profe/advisory-services/' + advisoryServiceId;
     var key = uuidV4() + '.' + file.originalname.split('.').pop();
-    
+
     return AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId)
         .then(advisoryService => {
-            advisoryService.totalFilesSize += file.size;                        
+            advisoryService.totalFilesSize += file.size;
             if (advisoryService.totalFilesSize > 25000000) {
                 return Promise.reject('El limite de tamaño de archivos ha sido excedido.');
             } else {
@@ -235,35 +248,35 @@ AdvisoryServiceServices.uploadFile = (advisoryServiceId, file) => {
                 return Promise.resolve(advisoryService);
             }
         })
-        .then(advisoryService => {AdvisoryServiceServices.updateAdvisoryService(advisoryServiceId, advisoryService)});
+        .then(advisoryService => { AdvisoryServiceServices.updateAdvisoryService(advisoryServiceId, advisoryService) });
 };
 
 AdvisoryServiceServices.matchTeacher = (advisoryServiceId, scheduleId) => {
     return Promise.all([
-            AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
-            ScheduleServices.getScheduleById(scheduleId)
-        ])
-            .then(values=>{
-                var advisoryService = values[0];
-                var schedule = values[1];
-                var result = {};
-                
-                var sessions = advisoryService.sessions.map(session=>{
-                    var sections = schedule.days.find(day => {return day.day === session.dayOfWeek; }).sections;
-                    session.existsSchedule = sections.some(section=>{
-                        var startTime = parseInt(session.startTime.replace(':',''));
-                        var endTime = parseInt(session.endTime.replace(':',''));
-                        return startTime >= section.startTime && endTime <= section.endTime;
-                    });
-                    return session;
+        AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
+        ScheduleServices.getScheduleById(scheduleId)
+    ])
+        .then(values => {
+            var advisoryService = values[0];
+            var schedule = values[1];
+            var result = {};
+
+            var sessions = advisoryService.sessions.map(session => {
+                var sections = schedule.days.find(day => { return day.day === session.dayOfWeek; }).sections;
+                session.existsSchedule = sections.some(section => {
+                    var startTime = parseInt(session.startTime.replace(':', ''));
+                    var endTime = parseInt(session.endTime.replace(':', ''));
+                    return startTime >= section.startTime && endTime <= section.endTime;
                 });
-                
-                result.matchSessions = sessions.filter(session=>{return session.existsSchedule;}).length;
-                result.percentageMatchSessions = result.matchSessions/sessions.length;
-                
-                return Promise.resolve(result);
-                
+                return session;
             });
+
+            result.matchSessions = sessions.filter(session => { return session.existsSchedule; }).length;
+            result.percentageMatchSessions = result.matchSessions / sessions.length;
+
+            return Promise.resolve(result);
+
+        });
 };
 
 module.exports = AdvisoryServiceServices;
