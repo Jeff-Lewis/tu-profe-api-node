@@ -1,7 +1,9 @@
 var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
+var config = require('../config');
 
 var Student = require('../models/student');
+var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
 
 var StudentServices = {};
@@ -10,8 +12,13 @@ StudentServices.createStudent = student => {
     return new Promise((resolve, reject) => {
         student.id = uuidV4();
         Student.create(student, (err, newStudent) => {
-            if (err) { reject(err); }
-            else { resolve(newStudent); }
+            if (err) {
+                reject(err);
+            }
+            else {
+                SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student));
+                resolve(newStudent);
+            }
         });
     });
 };
@@ -21,8 +28,12 @@ StudentServices.createStudent = student => {
  */
 StudentServices.getStudentById = studentId => {
     return new Promise((resolve, reject) => {
-        Student.get({ id: studentId }, (err, student) => {
-            if (err || student === undefined) { reject('Student not found'); }
+        Student.get({
+            id: studentId
+        }, (err, student) => {
+            if (err || student === undefined) {
+                reject('Student not found');
+            }
             else {
                 student.courses = student.courses || [];
                 resolve(student);
@@ -41,14 +52,19 @@ StudentServices.getStudentByEmail = email => {
     });
 };
 
-StudentServices.updateStudent = (studentId, studentUpdated) => {    
+StudentServices.updateStudent = (studentId, studentUpdated) => {
     return StudentServices.getStudentById(studentId)
         .then(student => {
             return new Promise((resolve, reject) => {
                 student = new Student(studentUpdated);
                 student.save(err => {
-                    if (err) { console.log(err); reject(err) }
-                    else { resolve(student) }
+                    if (err) {
+                        console.log(err);
+                        reject(err)
+                    }
+                    else {
+                        resolve(student)
+                    }
                 });
             });
         });
@@ -60,7 +76,7 @@ StudentServices.updatePhoto = (studentId, photo) => {
     var file = photo;
 
     return StudentServices.getStudentById(studentId)
-        .then(student => S3Services.uploadFile(bucketName, key, file));        
+        .then(student => S3Services.uploadFile(bucketName, key, file));
 };
 
 module.exports = StudentServices;

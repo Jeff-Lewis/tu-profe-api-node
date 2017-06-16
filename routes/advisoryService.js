@@ -3,7 +3,9 @@ var express = require('express'),
 
 var AdvisoryServiceServices = require('../services/advisoryService');
 
-var upload = multer({ dest: '..uploads/' });
+var upload = multer({
+    dest: '..uploads/'
+});
 
 var routes = AdvisoryService => {
     var advisoryServiceRouter = express.Router();
@@ -82,7 +84,7 @@ var routes = AdvisoryService => {
     advisoryServiceRouter.get('/teacher-match/:advisoryServiceId/:scheduleId', (req, res) => {
         AdvisoryServiceServices.matchTeacher(req.params.advisoryServiceId, req.params.scheduleId)
             .then(result => res.status(200).send(result))
-            .catch(err => console.log(err))//res.status(500).send(err));
+            .catch(err => res.status(500).send(err));
     });
 
     /**
@@ -98,6 +100,12 @@ var routes = AdvisoryService => {
                 console.log(err);
                 res.status(500).send(err);
             });
+    });
+
+    advisoryServiceRouter.post('/assign/:advisoryServiceId/:teacherId', (req, res) => {
+        AdvisoryServiceServices.assign(req.params.advisoryServiceId, req.params.teacherId)
+            .then(response => res.status(200).send(response))
+            .catch(err => console.log(err));
     });
 
     return advisoryServiceRouter;
