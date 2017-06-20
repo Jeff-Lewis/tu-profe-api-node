@@ -9,6 +9,7 @@ var AdvisoryServiceState = require('../models/enum/advisoryServiceState');
 var SessionState = require('../models/enum/sessionState');
 var TeacheState = require('../models/enum/teacherState');
 
+var CourseServices = require('../services/course');
 var CostConfigServices = require('../services/costConfig');
 var NotificationServices = require('../services/notification');
 var UtilsServices = require('../services/utils');
@@ -26,9 +27,11 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
         .then(advisoryService => AdvisoryServiceServices.calculate(advisoryService))
         .then(advisoryService => {
             return new Promise((resolve, reject) => {
-                advisoryService.status = AdvisoryServiceState.CREATED.value;
+                advisoryService.state = AdvisoryServiceState.CREATED.value;
                 advisoryService.id = uuidV4();
                 advisoryService.paid = false;
+                advisoryService.course = advisoryService.type === AdvisoryServiceType.TUTOR.value ? CourseServices.getTutorCourse() : advisoryService.course;
+                advisoryService.courseId = advisoryService.course.id;
                 advisoryService.sessions = advisoryService.sessions.map((session, index) => {
                     var startTime = session.startTime.split(':');
                     var startDate = moment(session.startDate);

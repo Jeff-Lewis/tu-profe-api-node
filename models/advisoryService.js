@@ -12,17 +12,17 @@ var advisoryService = new Schema({
     numStudents: { type: Number, default: 1 },
     startDate: { type: Date, default: 1 },
     numberHours: { type: Number, default: 2 },
-    courses: { type: [String], default: [] },
     sessions: { type: [Object], default: [] },
     cost: { type: Object },
     paid: { type: Boolean, required: true, default: false },
+    course: { type: Object },
+    courseId: { type: String },
 
     //Tutor 
     months: { type: Number, default: 1 },
     sessionsPerWeek: { type: Number, default: 1 },
 
-    //Special
-    course: { type: Object },
+    //Special    
     totalFilesSize: { type: Number, default: 0, validate: function (value) { return (value < 0 || value > 25000000) ? false : true } }
 });
 
