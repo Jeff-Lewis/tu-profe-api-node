@@ -81,8 +81,8 @@ var routes = AdvisoryService => {
                 .catch(err => res.status(500).send(err));
         });
 
-    advisoryServiceRouter.get('/teacher-match/:advisoryServiceId/:scheduleId', (req, res) => {
-        AdvisoryServiceServices.matchTeacher(req.params.advisoryServiceId, req.params.scheduleId)
+    advisoryServiceRouter.get('/get-available-services/:teacherId', (req, res) => {
+        AdvisoryServiceServices.getAvailableServices(req.params.teacherId)
             .then(result => res.status(200).send(result))
             .catch(err => res.status(500).send(err));
     });

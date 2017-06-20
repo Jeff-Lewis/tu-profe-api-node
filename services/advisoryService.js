@@ -14,7 +14,7 @@ var CostConfigServices = require('../services/costConfig');
 var NotificationServices = require('../services/notification');
 var UtilsServices = require('../services/utils');
 var ScheduleServices = require('../services/schedule');
-var TeacherService = require('../services/teacher');
+var TeacherServices = require('../services/teacher');
 var S3Services = require('../services/s3');
 var SQSServices = require('../services/sqs');
 var AdvisoryServiceServices = {};
@@ -86,7 +86,6 @@ AdvisoryServiceServices.getAdvisoryServiceById = advisoryServiceId => {
  * Get multiple Advisry Services that match with the params
  */
 AdvisoryServiceServices.filterByParams = params => {
-    console.log(params);
     return new Promise((resolve, reject) => {
         AdvisoryService.scan(params, function(err, advisoryServices) {
             if (err) reject(err);
@@ -289,7 +288,7 @@ AdvisoryServiceServices.assign = (advisoryServiceId, teacherId) => {
     console.log(advisoryServiceId, teacherId);
     return Promise.all([
             AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
-            TeacherService.getTeacherById(teacherId)
+            TeacherServices.getTeacherById(teacherId)
         ])
         .then(values => {
             var advisoryService = values[0];
@@ -315,36 +314,49 @@ AdvisoryServiceServices.assign = (advisoryServiceId, teacherId) => {
         });
 };
 
-AdvisoryServiceServices.matchTeacher = (advisoryServiceId, scheduleId) => {
-    return Promise.all([
-            AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
-            ScheduleServices.getScheduleById(scheduleId)
-        ])
-        .then(values => {
-            var advisoryService = values[0];
-            var schedule = values[1];
-            var result = {};
-
-            var sessions = advisoryService.sessions.map(session => {
-                var sections = schedule.days.find(day => {
-                    return day.day === session.dayOfWeek;
-                }).sections;
-                session.existsSchedule = sections.some(section => {
-                    var startTime = parseInt(session.startTime.replace(':', ''));
-                    var endTime = parseInt(session.endTime.replace(':', ''));
-                    return startTime >= section.startTime && endTime <= section.endTime;
-                });
-                return session;
+AdvisoryServiceServices.getAvailableServices = (teacherId) => {
+    return TeacherServices.getTeacherById(teacherId)
+        .then(teacher => {
+            var params = {
+                courseId: {in: teacher.courses},
+                state: {eq: 3}
+            };
+            return Promise.all([
+                ScheduleServices.getScheduleById(teacherId),
+                AdvisoryServiceServices.filterByParams(params)
+                ]);
+        })
+        .then(values=>{
+            var schedule = values[0];
+            var advisoryServices = values[1];
+            
+            advisoryServices = advisoryServices.map(advisoryService => {
+                advisoryService.matchSchedule = AdvisoryServiceServices.matchTeacherSchedule(advisoryService,schedule);
+                return advisoryService;
             });
-
-            result.matchSessions = sessions.filter(session => {
-                return session.existsSchedule;
-            }).length;
-            result.percentageMatchSessions = result.matchSessions / sessions.length;
-
-            return Promise.resolve(result);
-
+            
+            return Promise.resolve(advisoryServices);
         });
+};
+
+AdvisoryServiceServices.matchTeacherSchedule = (advisoryService, schedule) => {
+    var result = {};
+
+    var sessions = advisoryService.sessions.filter(session => {return session.state === SessionState.PENDING.value})
+        .map(session => {
+            var sections = schedule.days.find(day => {return day.day === session.dayOfWeek;}).sections;
+            session.existsSchedule = sections.some(section => {
+                var startTime = parseInt(session.startTime.replace(':', ''));
+                var endTime = parseInt(session.endTime.replace(':', ''));
+                return startTime >= section.startTime && endTime <= section.endTime;
+            });
+        return session;
+    });
+
+    result.matchSessions = sessions.filter(session => {return session.existsSchedule;}).length;
+    result.percentageMatchSessions = result.matchSessions / sessions.length;
+
+    return result;
 };
 
 module.exports = AdvisoryServiceServices;
