@@ -34,9 +34,10 @@ TeacherServices.createTeacher = teacher => {
 TeacherServices.getTeacherById = teacherId => {
     return new Promise((resolve, reject) => {
         Teacher.get({ id: teacherId }, (err, teacher) => {
-            if (err || teacher === undefined) { reject('Teacher not found'); }
+            if (err || teacher === undefined) { console.log(err,teacher);reject('Teacher not found'); }
             else {
                 teacher.courses = teacher.courses || [];
+                teacher.advisoryServices = teacher.advisoryServices || [];
                 resolve(teacher);
             }
         });

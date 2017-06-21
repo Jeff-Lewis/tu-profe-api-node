@@ -81,7 +81,7 @@ var routes = AdvisoryService => {
                 .catch(err => res.status(500).send(err));
         });
 
-    advisoryServiceRouter.get('/get-available-services/:teacherId', (req, res) => {
+    advisoryServiceRouter.get('/available-services/:teacherId', (req, res) => {
         AdvisoryServiceServices.getAvailableServices(req.params.teacherId)
             .then(result => res.status(200).send(result))
             .catch(err => res.status(500).send(err));
@@ -105,7 +105,7 @@ var routes = AdvisoryService => {
     advisoryServiceRouter.post('/assign/:advisoryServiceId/:teacherId', (req, res) => {
         AdvisoryServiceServices.assign(req.params.advisoryServiceId, req.params.teacherId)
             .then(response => res.status(200).send(response))
-            .catch(err => console.log(err));
+            .catch(err => res.status(500).send(err));
     });
 
     return advisoryServiceRouter;

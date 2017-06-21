@@ -44,7 +44,7 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                     endDate.add(session.duration, 'm');
 
                     return {
-                        id: index + 1,
+                        id: uuidV4(),
                         startDate: session.startDate,
                         startTime: session.startTime,
                         endTime: endDate.format('HH:mm'),
@@ -285,7 +285,6 @@ AdvisoryServiceServices.uploadFile = (advisoryServiceId, file) => {
 };
 
 AdvisoryServiceServices.assign = (advisoryServiceId, teacherId) => {
-    console.log(advisoryServiceId, teacherId);
     return Promise.all([
             AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
             TeacherServices.getTeacherById(teacherId)
@@ -300,12 +299,14 @@ AdvisoryServiceServices.assign = (advisoryServiceId, teacherId) => {
 
             if (teacherHasCourse) {
                 return Promise.reject('El profesor no dicta esta materia.')
-            }
-            else if (teacher.state !== TeacheState.ACTIVE.value) {
+            } else if (teacher.state !== TeacheState.ACTIVE.value) {
                 return Promise.reject('El profesor esta inactivo');
+            } else if (advisoryService.state !== AdvisoryServiceState.AVAILABLE.value){
+                return Promise.reject('La asesoria no esta disponible');
             }
 
             var message = {
+                id:uuidV4(),
                 teacherId: teacherId,
                 advisoryServiceId: advisoryServiceId
             };

@@ -29,6 +29,7 @@ var teacherSchema = new Schema({
     //Tu Profe Info
     interview: String,
     courses: { type: [String], default: [] },
+    advisoryServices: { type: [String], default: []},
 
     //Financial Data
     bankAccount: {
