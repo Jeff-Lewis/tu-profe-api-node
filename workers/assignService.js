@@ -13,31 +13,31 @@ var AssignService = {};
 
 AssignService.validate = request => {
     return Promise.all([
-            AdvisoryServiceServices.getAdvisoryServiceById(request.advisoryServiceId),
-            TeacherServices.getTeacherById(request.teacherId)
-        ])
-            .then(values => {
-                var advisoryService = values[0];
-                var teacher = values[1];
-    
-                var teacherHasCourse = !teacher.courses.some(course => {
-                    return course === advisoryService.course.id
-                });
-    
-                if (teacherHasCourse) {
-                    return Promise.reject('El profesor no dicta esta materia.')
-                } else if (teacher.state !== TeacheState.ACTIVE.value) {
-                    return Promise.reject('El profesor esta inactivo');
-                } else if (advisoryService.state !== AdvisoryServiceState.AVAILABLE.value){
-                    return Promise.reject('La asesoria no esta disponible');
-                }
-                
-                request.teacher = teacher;
-                request.advisoryService = advisoryService;
-                
-                return Promise.resolve(request);
+        AdvisoryServiceServices.getAdvisoryServiceById(request.advisoryServiceId),
+        TeacherServices.getTeacherById(request.teacherId)
+    ])
+        .then(values => {
+            var advisoryService = values[0];
+            var teacher = values[1];
 
+            var teacherHasCourse = !teacher.courses.some(course => {
+                return course === advisoryService.course.id
             });
+
+            if (teacherHasCourse) {
+                return Promise.reject('El profesor no dicta esta materia.')
+            } else if (teacher.state !== TeacheState.ACTIVE.value) {
+                return Promise.reject('El profesor esta inactivo');
+            } else if (advisoryService.state !== AdvisoryServiceState.AVAILABLE.value) {
+                return Promise.reject('La asesoria no esta disponible');
+            }
+
+            request.teacher = teacher;
+            request.advisoryService = advisoryService;
+
+            return Promise.resolve(request);
+
+        });
 };
 
 AssignService.assign = request => {
@@ -46,18 +46,18 @@ AssignService.assign = request => {
         name: `${request.teacher.name} ${request.teacher.lastName}`,
         id: request.teacher.id
     };
-    
+
     request.teacher.advisoryServices.push(request.advisoryService.id);
-    
-    return Promise.all([            
-            AdvisoryServiceServices.updateAdvisoryService(request.advisoryService.id, request.advisoryService),
-            TeacherServices.updateTeacher(request.teacher.id, request.teacher)
-        ]);
+
+    return Promise.all([
+        AdvisoryServiceServices.updateAdvisoryService(request.advisoryService.id, request.advisoryService),
+        TeacherServices.updateTeacher(request.teacher.id, request.teacher)
+    ]);
 };
 
 AssignService.notify = (request, values, err) => {
     var notification = {};
-    if(err) {
+    if (err) {
         console.log(`ERROR: ${err}`);
         notification.title = "Servicio NO Asignado";
         notification.text = `Lo sentimos, el servicio con ID: ${request.advisoryService.id} no ha podido ser asignado, motivo: ${err}`;
@@ -70,40 +70,34 @@ AssignService.notify = (request, values, err) => {
         notification.type = 2;
         notification.userId = request.teacher.id;
     }
-    
+
     return NotificationServices.createNotification(notification);
 };
 
 var app = Consumer.create({
     queueUrl: config.queues.assignAdvisoryService,
-    batchSize: 10,
+    batchSize: 1,
     handleMessage: (message, done) => {
 
-        return new Promise((resolve, reject)=>{
-            var request = JSON.parse(message.Body);
-            console.log('--------------------------------------------------');
-            console.log('Start Process');
-            console.log(`Id: ${request.id} - teacherId: ${request.teacherId} - advisoryServiceId: ${request.advisoryServiceId}`);
-            
-            return AssignService.validate(request)
-                .then(request => AssignService.assign(request))
-                .then(values => AssignService.notify(request, values, null))
-                .then(()=>{
-                    done();
-                    resolve();
-                })
-                .catch(err => {
-                    AssignService.notify(request, null, err)
-                    done();
-                    reject();
-                });
-                        
-        });
+        var request = JSON.parse(message.Body);
+        console.log('--------------------------------------------------');
+        console.log(`Start Process : ${new Date()}`);
+        console.log(`Id: ${request.id} - teacherId: ${request.teacherId} - advisoryServiceId: ${request.advisoryServiceId}`);
 
+        AssignService.validate(request)
+            .then(request => AssignService.assign(request))
+            .then(values => AssignService.notify(request, values, null))
+            .then(() => {
+                return done();
+            })
+            .catch(err => {
+                AssignService.notify(request, null, err)
+                return done();
+            });
     }
 });
 
-app.on('error', function(err) {
+app.on('error', function (err) {
     console.log(err);
 });
 
