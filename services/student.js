@@ -16,7 +16,8 @@ StudentServices.createStudent = student => {
                 reject(err);
             }
             else {
-                SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student));
+                var sqsAttributes = { 'MailType': { DataType: 'String', StringValue: 'CREATE_STUDENT' } };
+                SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
                 resolve(newStudent);
             }
         });

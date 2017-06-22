@@ -53,7 +53,7 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                         state: SessionState.PENDING.value
                     };
                 });
-                AdvisoryService.create(advisoryService, function(err, newAdvisoryService) {
+                AdvisoryService.create(advisoryService, function (err, newAdvisoryService) {
                     if (err) reject(err);
                     else {
                         AdvisoryServiceServices.sendNotification(newAdvisoryService);
@@ -87,7 +87,7 @@ AdvisoryServiceServices.getAdvisoryServiceById = advisoryServiceId => {
  */
 AdvisoryServiceServices.filterByParams = params => {
     return new Promise((resolve, reject) => {
-        AdvisoryService.scan(params, function(err, advisoryServices) {
+        AdvisoryService.scan(params, function (err, advisoryServices) {
             if (err) reject(err);
             else resolve(advisoryServices);
         });
@@ -286,9 +286,9 @@ AdvisoryServiceServices.uploadFile = (advisoryServiceId, file) => {
 
 AdvisoryServiceServices.assign = (advisoryServiceId, teacherId) => {
     return Promise.all([
-            AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
-            TeacherServices.getTeacherById(teacherId)
-        ])
+        AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId),
+        TeacherServices.getTeacherById(teacherId)
+    ])
         .then(values => {
             var advisoryService = values[0];
             var teacher = values[1];
@@ -297,16 +297,16 @@ AdvisoryServiceServices.assign = (advisoryServiceId, teacherId) => {
                 return course === advisoryService.course.id
             });
 
-            if (teacherHasCourse) {
+            /*if (teacherHasCourse) {
                 return Promise.reject('El profesor no dicta esta materia.')
             } else if (teacher.state !== TeacheState.ACTIVE.value) {
                 return Promise.reject('El profesor esta inactivo');
-            } else if (advisoryService.state !== AdvisoryServiceState.AVAILABLE.value){
+            } else if (advisoryService.state !== AdvisoryServiceState.AVAILABLE.value) {
                 return Promise.reject('La asesoria no esta disponible');
-            }
+            }*/
 
             var message = {
-                id:uuidV4(),
+                id: uuidV4(),
                 teacherId: teacherId,
                 advisoryServiceId: advisoryServiceId
             };
@@ -319,23 +319,23 @@ AdvisoryServiceServices.getAvailableServices = (teacherId) => {
     return TeacherServices.getTeacherById(teacherId)
         .then(teacher => {
             var params = {
-                courseId: {in: teacher.courses},
-                state: {eq: 3}
+                courseId: { in: teacher.courses },
+                state: { eq: 3 }
             };
             return Promise.all([
                 ScheduleServices.getScheduleById(teacherId),
                 AdvisoryServiceServices.filterByParams(params)
-                ]);
+            ]);
         })
-        .then(values=>{
+        .then(values => {
             var schedule = values[0];
             var advisoryServices = values[1];
-            
+
             advisoryServices = advisoryServices.map(advisoryService => {
-                advisoryService.matchSchedule = AdvisoryServiceServices.matchTeacherSchedule(advisoryService,schedule);
+                advisoryService.matchSchedule = AdvisoryServiceServices.matchTeacherSchedule(advisoryService, schedule);
                 return advisoryService;
             });
-            
+
             return Promise.resolve(advisoryServices);
         });
 };
@@ -343,18 +343,23 @@ AdvisoryServiceServices.getAvailableServices = (teacherId) => {
 AdvisoryServiceServices.matchTeacherSchedule = (advisoryService, schedule) => {
     var result = {};
 
-    var sessions = advisoryService.sessions.filter(session => {return session.state === SessionState.PENDING.value})
+    var sessions = advisoryService.sessions.filter(session => { return session.state === SessionState.PENDING.value })
         .map(session => {
-            var sections = schedule.days.find(day => {return day.day === session.dayOfWeek;}).sections;
-            session.existsSchedule = sections.some(section => {
-                var startTime = parseInt(session.startTime.replace(':', ''));
-                var endTime = parseInt(session.endTime.replace(':', ''));
-                return startTime >= section.startTime && endTime <= section.endTime;
-            });
-        return session;
-    });
+            session.existsSchedule = false;
+            var day = schedule.days.find(day => { return day.day === session.dayOfWeek; });
 
-    result.matchSessions = sessions.filter(session => {return session.existsSchedule;}).length;
+            if (day) {
+                session.existsSchedule = day.sections.some(section => {
+                    var startTime = parseInt(session.startTime.replace(':', ''));
+                    var endTime = parseInt(session.endTime.replace(':', ''));
+                    return startTime >= section.startTime && endTime <= section.endTime;
+                });
+            }
+
+            return session;
+        });
+
+    result.matchSessions = sessions.filter(session => { return session.existsSchedule; }).length;
     result.percentageMatchSessions = result.matchSessions / sessions.length;
 
     return result;

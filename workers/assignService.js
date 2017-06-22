@@ -59,14 +59,14 @@ AssignService.notify = (request, values, err) => {
     var notification = {};
     if (err) {
         console.log(`ERROR: ${err}`);
-        notification.title = "Servicio NO Asignado";
+        notification.title = 'Servicio NO Asignado';
         notification.text = `Lo sentimos, el servicio con ID: ${request.advisoryService.id} no ha podido ser asignado, motivo: ${err}`;
         notification.type = 1;
         notification.userId = request.teacher.id;
     } else {
         console.log(`SUCCESS`);
-        notification.title = "Servicio Asignado";
-        notification.text = "Felicitaciones, el servicio con ID: ${request.advisoryService.id} le ha sido asignado.";
+        notification.title = 'Servicio Asignado';
+        notification.text = `Felicitaciones, el servicio con ID: ${request.advisoryService.id} le ha sido asignado.`;
         notification.type = 2;
         notification.userId = request.teacher.id;
     }
@@ -92,12 +92,15 @@ var app = Consumer.create({
             })
             .catch(err => {
                 AssignService.notify(request, null, err)
-                return done();
+                    .then(() => {
+                        return done()
+                    })
             });
     }
 });
 
 app.on('error', function (err) {
+    console.log('here');
     console.log(err);
 });
 
