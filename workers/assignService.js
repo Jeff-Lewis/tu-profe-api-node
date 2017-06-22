@@ -49,9 +49,9 @@ AssignService.assign = request => {
     
     request.teacher.advisoryServices.push(request.advisoryService.id);
     
-    return Promise.all([
-            TeacherServices.updateTeacher(request.teacher),
-            AdvisoryServiceServices.updateAdvisoryService(request.advisoryService)
+    return Promise.all([            
+            AdvisoryServiceServices.updateAdvisoryService(request.advisoryService.id, request.advisoryService),
+            TeacherServices.updateTeacher(request.teacher.id, request.teacher)
         ]);
 };
 
@@ -85,7 +85,7 @@ var app = Consumer.create({
             console.log('Start Process');
             console.log(`Id: ${request.id} - teacherId: ${request.teacherId} - advisoryServiceId: ${request.advisoryServiceId}`);
             
-            AssignService.validate(request)
+            return AssignService.validate(request)
                 .then(request => AssignService.assign(request))
                 .then(values => AssignService.notify(request, values, null))
                 .then(()=>{
@@ -97,8 +97,7 @@ var app = Consumer.create({
                     done();
                     reject();
                 });
-            
-            console.log('--------------------------------------------------');
+                        
         });
 
     }
