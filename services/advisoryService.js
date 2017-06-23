@@ -320,7 +320,7 @@ AdvisoryServiceServices.getAvailableServices = (teacherId) => {
         .then(teacher => {
             var params = {
                 courseId: { in: teacher.courses },
-                state: { eq: 3 }
+                state: { eq: 1 }
             };
             return Promise.all([
                 ScheduleServices.getScheduleById(teacherId),
