@@ -93,7 +93,7 @@ var app = Consumer.create({
             .catch(err => {
                 AssignService.notify(request, null, err)
                     .then(() => {
-                        return done()
+                        return done();
                     })
             });
     }

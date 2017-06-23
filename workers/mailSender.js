@@ -1,13 +1,8 @@
 var Consumer = require('sqs-consumer');
 var Promise = require('promise');
 
-var TeacheState = require('../models/enum/teacherState');
-var AdvisoryServiceState = require('../models/enum/advisoryServiceState');
-
 var config = require('../config');
-var TeacherServices = require('../services/teacher');
-var NotificationServices = require('../services/notification');
-var AdvisoryServiceServices = require('../services/advisoryService');
+var SendGridServices = require('../services/sendGrid');
 
 var app = Consumer.create({
     queueUrl: config.queues.mailQueue,
@@ -19,15 +14,21 @@ var app = Consumer.create({
         var request = JSON.parse(message.Body);
         console.log('--------------------------------------------------');
         console.log(`Start Process : ${new Date()}`);
-        console.log(JSON.stringify(message));
 
-        done();
+        SendGridServices.sendTemplateMail(request.name, request.email, '3f43307c-ead4-4e56-844f-f3dd85029000')
+            .then(response => {
+                console.log(response);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        return done();
 
     }
 });
 
 app.on('error', function (err) {
-    console.log('here');
     console.log(err);
 });
 
