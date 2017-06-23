@@ -8,7 +8,7 @@ var subject = 'Sending with SendGrid is Fun';
 var content = new helper.Content('text/plain', 'and easy to do anywhere, even with Node.js');
 var mail = new helper.Mail(fromEmail, subject, toEmail, content);
 
-var sg = require('sendgrid')('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');
+var sg = require('sendgrid')('');
 var request = sg.emptyRequest({
   method: 'POST',
   path: '/v3/mail/send',
@@ -25,7 +25,7 @@ sg.API(request, function (error, response) {
 });
 
 /*
-var sg = require('sendgrid')('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');
+var sg = require('sendgrid')('');
 var helper = require('sendgrid').mail;
 var fromEmail = new helper.Email('test@example.com');
 var toEmail = new helper.Email('diego.alfonso.prieto.torres@gmail.com');
