@@ -77,30 +77,28 @@ AssignService.notify = (request, values, err) => {
 var app = Consumer.create({
     queueUrl: config.queues.assignAdvisoryService,
     batchSize: 1,
-    handleMessage: (message, done) => {
+    handleMessage: async (message, done) => {
 
+        var updatedObjects;
         var request = JSON.parse(message.Body);
         console.log('--------------------------------------------------');
         console.log(`Start Process : ${new Date()}`);
         console.log(`Id: ${request.id} - teacherId: ${request.teacherId} - advisoryServiceId: ${request.advisoryServiceId}`);
 
-        AssignService.validate(request)
-            .then(request => AssignService.assign(request))
-            .then(values => AssignService.notify(request, values, null))
-            .then(() => {
-                return done();
-            })
-            .catch(err => {
-                AssignService.notify(request, null, err)
-                    .then(() => {
-                        return done();
-                    })
-            });
+        try {
+            request = await AssignService.validate(request);
+            updatedObjects = await AssignService.assign(request);
+            AssignService.notify(request, updatedObjects, null);
+        } catch (err) {
+            await AssignService.notify(request, null, err)
+        } finally {
+            console.log('--------------------------------------------------');
+            return done();
+        }
     }
 });
 
 app.on('error', function (err) {
-    console.log('here');
     console.log(err);
 });
 

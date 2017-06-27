@@ -17,7 +17,6 @@ var SchoolServices = {};
 
 SchoolServices.createSchool = school => {
     var create = geoInfo => {
-        console.log(geoInfo);
         return new Promise((resolve, reject) => {
             school.id = uuidV4();
             school.city = geoInfo.city;
@@ -27,10 +26,8 @@ SchoolServices.createSchool = school => {
             school.formattedAddress = geoInfo.formattedAddress;
             school.latitude = geoInfo.latitude;
             school.longitude = geoInfo.longitude
-            console.log(school);
             School.create(school, function (err, newSchool) {
                 if (err) {
-                    console.log(err);
                     reject(err);
                 } else {
                     resolve(school);
@@ -42,7 +39,6 @@ SchoolServices.createSchool = school => {
     return geocoder.geocode(school.address)
         .then(geoInfo => create(geoInfo[0]))
         .catch(err => {
-            console.log(err);
             throw err;
         });
 
