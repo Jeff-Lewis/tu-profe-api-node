@@ -1,5 +1,6 @@
 var Consumer = require('sqs-consumer');
 var Promise = require('promise');
+var moment = require('moment');
 
 var TeacheState = require('../models/enum/teacherState');
 var AdvisoryServiceState = require('../models/enum/advisoryServiceState');
@@ -12,6 +13,7 @@ var AdvisoryServiceServices = require('../services/advisoryService');
 var AssignService = {};
 
 AssignService.validate = request => {
+    request.date = new Date();
     return Promise.all([
         AdvisoryServiceServices.getAdvisoryServiceById(request.advisoryServiceId),
         TeacherServices.getTeacherById(request.teacherId)
@@ -56,19 +58,20 @@ AssignService.assign = request => {
 };
 
 AssignService.notify = (request, values, err) => {
+    request.dateToShow = moment(request.date).format('MMMM Do YYYY, h:mm:ss a');
     var notification = {};
     if (err) {
         console.log(`ERROR: ${err}`);
         notification.title = 'Servicio NO Asignado';
-        notification.text = `Lo sentimos, el servicio con ID: ${request.advisoryService.id} no ha podido ser asignado, motivo: ${err}`;
+        notification.text = `La solicitud de asignación con ID: ${request.id} fue procesada a las ${request.dateToShow} y ha sido denegada, el motivo fue: ${err}. Si usted considera que es un error y debe ser revisado, por favor contacte con la oficina.`;
         notification.type = 1;
-        notification.userId = request.teacher.id;
+        notification.userId = request.teacherId;
     } else {
         console.log(`SUCCESS`);
         notification.title = 'Servicio Asignado';
-        notification.text = `Felicitaciones, el servicio con ID: ${request.advisoryService.id} le ha sido asignado.`;
+        notification.text = `Felicitaciones, el servicio con ID: ${request.advisoryServiceId} le ha sido asignado.`;
         notification.type = 2;
-        notification.userId = request.teacher.id;
+        notification.userId = request.teacherId;
     }
 
     return NotificationServices.createNotification(notification);
@@ -90,7 +93,7 @@ var app = Consumer.create({
             updatedObjects = await AssignService.assign(request);
             AssignService.notify(request, updatedObjects, null);
         } catch (err) {
-            await AssignService.notify(request, null, err)
+            await AssignService.notify(request, null, err);
         } finally {
             console.log('--------------------------------------------------');
             return done();

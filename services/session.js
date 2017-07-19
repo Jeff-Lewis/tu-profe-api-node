@@ -37,13 +37,10 @@ SessionServices.signUpUser = (userType, user) => {
                 switch(userType){
                     case 'Teacher':
                         return TeacherService.createTeacher(user);
-                        break;
                     case 'Student':
                         return StudentServices.createStudent(user);
-                        break;
                     case 'Admin':
                         return AdminServices.createAdmin(user);
-                        break;
                     default:
                         Promise.reject('El tipo de usuario no es valido');
                         break;

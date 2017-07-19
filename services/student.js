@@ -8,20 +8,26 @@ var S3Services = require('../services/s3');
 
 var StudentServices = {};
 
-StudentServices.createStudent = student => {
-    return new Promise((resolve, reject) => {
-        student.id = uuidV4();
-        Student.create(student, (err, newStudent) => {
-            if (err) {
-                reject(err);
-            }
-            else {
-                var sqsAttributes = { 'MailType': { DataType: 'String', StringValue: 'CREATE_STUDENT' } };
-                SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
-                resolve(newStudent);
-            }
+StudentServices.createStudent = async student => {
+
+    try {
+        await StudentServices.getStudentByEmail(student.email);
+        return Promise.reject('Este correo ya está asociado a otro estudiante.');
+    } catch (error) {
+        return new Promise((resolve, reject) => {
+            student.id = uuidV4();
+            Student.create(student, (err, newStudent) => {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    var sqsAttributes = { 'MailType': { DataType: 'String', StringValue: 'CREATE_STUDENT' } };
+                    SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
+                    resolve(newStudent);
+                }
+            });
         });
-    });
+    }
 };
 
 /**
