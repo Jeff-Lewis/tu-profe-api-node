@@ -156,6 +156,12 @@ AdvisoryServiceServices.calculate = advisoryService => {
                 });
         }
         else if (advisoryService.type === 2) {
+            if (advisoryService.timePerSession === undefined || advisoryService.timePerSession <= 0 ||
+                advisoryService.numStudents === undefined || advisoryService.numStudents <= 0 ||
+                advisoryService.numSessions === undefined || advisoryService.numSessions <= 0 ||
+                advisoryService.course === undefined || advisoryService.course.difficulty === undefined) {
+                reject('Datos insuficientes para calcular precio');
+            }
             h = advisoryService.timePerSession * advisoryService.numSessions;
             costParams.courseType = advisoryService.course.difficulty;
             if (advisoryService.course.difficulty === 'Regular') {
