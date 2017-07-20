@@ -118,80 +118,82 @@ AdvisoryServiceServices.updateAdvisoryService = (advisoryServiceId, advisoryServ
  * Calculate advisory Service cost
  */
 AdvisoryServiceServices.calculate = advisoryService => {
-    return AdvisoryServiceServices.validate(advisoryService)
-        .then(advisoryService => {
-            return new Promise((resolve, reject) => {
-                var cost = {};
-                var h = 0;
+    return new Promise((resolve, reject) => {
+        var cost = {};
+        var h = 0;
 
-                var costParams = {
-                    advisoryServiceType: advisoryService.type,
-                    numStudents: advisoryService.numStudents
-                };
+        var costParams = {
+            advisoryServiceType: advisoryService.type,
+            numStudents: advisoryService.numStudents
+        };
 
-                var tutorFunction = (L, M, N, D, O, G, F, E, h) => {
-                    return ((L * h + M + (N * h + O) * (advisoryService.numStudents - 1)) / D * h + E) / F * G * 4
-                };
+        var tutorFunction = (L, M, N, D, O, G, F, E, h) => {
+            return ((L * h + M + (N * h + O) * (advisoryService.numStudents - 1)) / D * h + E) / F * G * 4
+        };
 
-                var costFunction = (L, M, A, D, C, G, F, E, h) => {
-                    return ((L * h + M + (A - C * (h - 8) / 2) / D) * 2 + E) / F * G / 2;
-                };
+        var costFunction = (L, M, A, D, C, G, F, E, h) => {
+            return ((L * h + M + (A - C * (h - 8) / 2) / D) * 2 + E) / F * G / 2;
+        };
 
-                if (advisoryService.type === 1) {
-                    CostConfigServices.getCostConfigById('eb1f04cd-5991-4350-b050-4a435f516b47')
-                        .then(costConfig => {
-                            costConfig = costConfig.config;
-                            costConfig.E = 600 * 1.19;
-                            costConfig.F = 1 - 0.0299 * 1.19;
-                            h = 2 * advisoryService.sessionsPerWeek;
-                            cost.costPerMonth = tutorFunction(costConfig.L, costConfig.M, costConfig.N, costConfig.D, costConfig.O, costConfig.G, costConfig.F, costConfig.E, h)
-                            cost.costPerMonth = UtilsServices.ceil10(cost.costPerMonth, 2);
-                            cost.total = cost.costPerMonth * advisoryService.months;
+        if (advisoryService.type === 1) {
+            if (advisoryService.numStudents === undefined || advisoryService.numStudents <= 0 ||
+                advisoryService.sessionsPerWeek === undefined || advisoryService.sessionsPerWeek <= 0 ||
+                advisoryService.months === undefined || advisoryService.months <= 0) {
+                reject('Datos insuficientes para calcular precio');
+            }
+            CostConfigServices.getCostConfigById('eb1f04cd-5991-4350-b050-4a435f516b47')
+                .then(costConfig => {
+                    costConfig = costConfig.config;
+                    costConfig.E = 600 * 1.19;
+                    costConfig.F = 1 - 0.0299 * 1.19;
+                    h = 2 * advisoryService.sessionsPerWeek;
+                    cost.costPerMonth = tutorFunction(costConfig.L, costConfig.M, costConfig.N, costConfig.D, costConfig.O, costConfig.G, costConfig.F, costConfig.E, h)
+                    cost.costPerMonth = UtilsServices.ceil10(cost.costPerMonth, 2);
+                    cost.total = cost.costPerMonth * advisoryService.months;
 
-                            advisoryService.cost = cost;
-                            resolve(advisoryService);
-                        });
-                }
-                else if (advisoryService.type === 2) {
-                    h = advisoryService.timePerSession * advisoryService.numSessions;
-                    costParams.courseType = advisoryService.course.difficulty;
-                    if (advisoryService.course.difficulty === 'Regular') {
-                        if (h < 8) {
-                            costParams.greaterThanLimit = 0;
-                        }
-                        else {
-                            costParams.greaterThanLimit = 1;
-                        }
-                    }
-                    else if (advisoryService.course.difficulty === 'Especializado') {
-                        if (h < 8) {
-                            costParams.greaterThanLimit = 0;
-                        }
-                        else {
-                            costParams.greaterThanLimit = 1;
-                        }
-                    }
-
-                    CostConfigServices.getCostConfig(costParams.advisoryServiceType, costParams.courseType, costParams.greaterThanLimit, costParams.numStudents)
-                        .then(costConfig => {
-                            costConfig = costConfig.config;
-                            costConfig.E = 600 * 1.19;
-                            costConfig.F = 1 - 0.0299 * 1.19;
-
-                            cost.costPerHour = costFunction(costConfig.L, costConfig.M, costConfig.A, costConfig.D, costConfig.C, costConfig.G, costConfig.F, costConfig.E, h)
-                            cost.costPerHour = UtilsServices.ceil10(cost.costPerHour, 2);
-                            cost.total = cost.costPerHour * h;
-
-                            advisoryService.cost = cost;
-                            resolve(advisoryService);
-                        });
+                    advisoryService.cost = cost;
+                    resolve(advisoryService);
+                });
+        }
+        else if (advisoryService.type === 2) {
+            h = advisoryService.timePerSession * advisoryService.numSessions;
+            costParams.courseType = advisoryService.course.difficulty;
+            if (advisoryService.course.difficulty === 'Regular') {
+                if (h < 8) {
+                    costParams.greaterThanLimit = 0;
                 }
                 else {
-                    reject('No es posible calcular el valor a este tipo de servicio.');
+                    costParams.greaterThanLimit = 1;
                 }
+            }
+            else if (advisoryService.course.difficulty === 'Especializado') {
+                if (h < 8) {
+                    costParams.greaterThanLimit = 0;
+                }
+                else {
+                    costParams.greaterThanLimit = 1;
+                }
+            }
 
-            });
-        });
+            CostConfigServices.getCostConfig(costParams.advisoryServiceType, costParams.courseType, costParams.greaterThanLimit, costParams.numStudents)
+                .then(costConfig => {
+                    costConfig = costConfig.config;
+                    costConfig.E = 600 * 1.19;
+                    costConfig.F = 1 - 0.0299 * 1.19;
+
+                    cost.costPerHour = costFunction(costConfig.L, costConfig.M, costConfig.A, costConfig.D, costConfig.C, costConfig.G, costConfig.F, costConfig.E, h)
+                    cost.costPerHour = UtilsServices.ceil10(cost.costPerHour, 2);
+                    cost.total = cost.costPerHour * h;
+
+                    advisoryService.cost = cost;
+                    resolve(advisoryService);
+                });
+        }
+        else {
+            reject('No es posible calcular el valor a este tipo de servicio.');
+        }
+
+    });
 };
 
 /**

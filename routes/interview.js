@@ -59,7 +59,6 @@ var routes = function (Interview) {
 
             InterviewService.takePlace(interviewId, teacherId)
                 .then(() => {
-                    console.log('is returning');
                     res.status(200).send();
                 })
                 .catch((err) => {

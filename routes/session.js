@@ -33,6 +33,7 @@ var routes = function (Teacher, Student, Admin) {
             var student = new Student(req.body);
             SessionServices.signUpUser('Student',student)
                 .then(newStudent => {
+                    console.log(newStudent);
                     res.status(201).send(student);
                 }, err => {
                     res.status(500).send(err);

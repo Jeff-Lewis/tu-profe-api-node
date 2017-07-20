@@ -22,7 +22,7 @@ NotificationServices.updateNotification = (notificationId, notificationUpdated) 
             return new Promise((resolve, reject) => {
                 notification = new Notification(notificationUpdated);
                 notification.save(err => {
-                    if (err) { console.log(err); reject(err) }
+                    if (err) { reject(err) }
                     else { resolve(notification) }
                 });
             });
