@@ -1,5 +1,6 @@
 // using SendGrid's v3 Node.js Library
 // https://github.com/sendgrid/sendgrid-nodejs
+/*
 var helper = require('sendgrid').mail;
 var fromEmail = new helper.Email('test@example.com');
 var toEmail = new helper.Email('diego.alfonso.prieto.torres@gmail.com');
@@ -25,4 +26,35 @@ sg.API(request, function(error, response) {
   console.log('Status: ', response.statusCode);
   console.log('Body: ', response.body);
   console.log('Headers: ', response.headers);
+});
+*/
+
+var nodemailer = require('nodemailer');
+
+var transporter = nodemailer.createTransport({
+  service: 'gmail',
+  secure: false,
+  port: 25,
+  auth: {
+    user: 'diego.alfonso.prieto.torres@gmail.com',
+    pass: process.env.TU_PROFE_GMAIL_PASSWORD
+  },
+  tls: {
+    rejectUnauthorized: false
+  }
+});
+
+var mailOptions = {
+  from: 'TuProfeNoReply <tu-profe-noreply@gmail.com>',
+  to: 'diego.prieto.torres@hotmail.com',
+  subject: 'Sending Email using Node.js',
+  text: 'That was easy!'
+};
+
+transporter.sendMail(mailOptions, function (error, info) {
+  if (error) {
+    console.log(error);
+  } else {
+    console.log('Email sent: ' + info.response);
+  }
 });
