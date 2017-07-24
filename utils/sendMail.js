@@ -11,7 +11,7 @@ var substitution = new helper.Substitution("%name%", "User's Name")
 mail.personalizations[0].addSubstitution(substitution)
 mail.setTemplateId('1bb85931-4c35-4bee-9a38-798e9736a58e')
 
-var sg = require('sendgrid')('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');
+var sg = require('sendgrid')('');
 var request = sg.emptyRequest({
   method: 'POST',
   path: '/v3/mail/send',
