@@ -1,4 +1,5 @@
 var nodemailer = require('nodemailer');
+var Promise = require('promise');
 
 var NodemailerServices = {};
 

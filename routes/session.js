@@ -12,7 +12,7 @@ var routes = function (Teacher, Student, Admin) {
     sessionRoute.route('/teacher/signup')
         .post((req, res) => {
             var teacher = new Teacher(req.body);
-            SessionServices.signUpUser('Teacher',teacher)
+            SessionServices.signUpUser('Teacher', teacher)
                 .then(newTeacher => {
                     res.status(201).send(teacher);
                 }, err => {
@@ -31,7 +31,7 @@ var routes = function (Teacher, Student, Admin) {
     sessionRoute.route('/student/signup')
         .post((req, res) => {
             var student = new Student(req.body);
-            SessionServices.signUpUser('Student',student)
+            SessionServices.signUpUser('Student', student)
                 .then(newStudent => {
                     console.log(newStudent);
                     res.status(201).send(student);
@@ -59,6 +59,15 @@ var routes = function (Teacher, Student, Admin) {
                 });
         });
 
+    sessionRoute.post('/forgot-password', (req, res) => {
+        SessionServices.forgotPassword(req.body.userType, req.body.email)
+            .then(response => {
+                res.status(201).send(response);
+            }, err => {
+                console.log(err);
+                res.status(500).send(err);
+            });
+    });
     return sessionRoute;
 };
 
