@@ -70,6 +70,7 @@ for (var i = 0; i < MailType.enums.length ; i++) {
 }
 */
 
+/*
 var MailTemplateServices = require('../services/mailTemplate');
 var data = {
   name: 'diego'
@@ -84,4 +85,18 @@ MailTemplateServices.getMailTemplateById('STUDENT_SIGN_UP')
     console.log(tpl);
   })
   .catch(err => console.log(err));
+*/
 
+var SQSServices = require('../services/sqs');
+var MailType = require('../models/enum/mailType');
+var config = require('../config');
+
+var student = {
+  name: 'diego',
+  email: 'diego.prieto.torres@hotmail.com'
+}
+var sqsAttributes = {
+  MailType: { DataType: 'String', StringValue: MailType.STUDENT_SIGN_UP.key },
+  Mail: { DataType: 'String', StringValue: student.email }
+};
+SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);

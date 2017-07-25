@@ -3,6 +3,7 @@ var Promise = require('promise');
 var config = require('../config');
 
 var Student = require('../models/student');
+var MailType = require('../models/enum/mailType');
 var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
 
@@ -21,7 +22,10 @@ StudentServices.createStudent = async student => {
                     reject(err);
                 }
                 else {
-                    var sqsAttributes = { 'MailType': { DataType: 'String', StringValue: 'CREATE_STUDENT' } };
+                    var sqsAttributes = {
+                        MailType: { DataType: 'String', StringValue: MailType.STUDENT_SIGN_UP.key },
+                        Mail: { DataType: 'String', StringValue: student.email }
+                    };
                     SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
                     resolve(newStudent);
                 }

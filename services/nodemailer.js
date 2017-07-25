@@ -2,6 +2,19 @@ var nodemailer = require('nodemailer');
 
 var NodemailerServices = {};
 
+NodemailerServices.sendMail = (mailOptions) => {
+    return new Promise((resolve, reject) => {
+        var transporter = getTransporter();
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(info);
+            }
+        });
+    });
+};
+
 var getTransporter = () => {
     var transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -15,6 +28,7 @@ var getTransporter = () => {
             rejectUnauthorized: false
         }
     });
+    return transporter;
 };
 
 module.exports = NodemailerServices;
