@@ -2,7 +2,6 @@ var Consumer = require('sqs-consumer');
 var Promise = require('promise');
 
 var config = require('../config');
-var SendGridServices = require('../services/sendGrid');
 
 var app = Consumer.create({
     queueUrl: config.queues.mailQueue,
@@ -15,13 +14,8 @@ var app = Consumer.create({
         console.log('--------------------------------------------------');
         console.log(`Start Process : ${new Date()}`);
 
-        SendGridServices.sendTemplateMail(request.name, request.email, '3f43307c-ead4-4e56-844f-f3dd85029000')
-            .then(response => {
-                console.log(response);
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        console.log(message);
+        console.log(request);
 
         return done();
 

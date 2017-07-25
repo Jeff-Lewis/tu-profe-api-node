@@ -29,6 +29,7 @@ sg.API(request, function(error, response) {
 });
 */
 
+/*
 var nodemailer = require('nodemailer');
 
 var transporter = nodemailer.createTransport({
@@ -58,3 +59,29 @@ transporter.sendMail(mailOptions, function (error, info) {
     console.log('Email sent: ' + info.response);
   }
 });
+*/
+
+/*
+var MailType = require('../models/enum/mailType');
+console.log(MailType.enums);
+
+for (var i = 0; i < MailType.enums.length ; i++) { 
+  console.log(MailType.enums[i].value + ' => ' + MailType.enums[i].key) 
+}
+*/
+
+var MailTemplateServices = require('../services/mailTemplate');
+var data = {
+  name: 'diego'
+};
+
+console.log(MailTemplateServices);
+
+MailTemplateServices.getMailTemplateById('STUDENT_SIGN_UP')
+  .then(mailTemplate => {
+    console.log(mailTemplate)
+    var tpl = eval('`' + mailTemplate.text + '`');
+    console.log(tpl);
+  })
+  .catch(err => console.log(err));
+
