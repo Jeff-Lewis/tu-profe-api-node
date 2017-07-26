@@ -1,9 +1,12 @@
 var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
+var config = require('../config');
 
 var Teacher = require('../models/teacher');
 var TeacheState = require('../models/enum/teacherState');
+var MailType = require('../models/enum/mailType');
 var ScheduleServices = require('../services/schedule');
+var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
 var TeacherServices = {};
 
@@ -11,21 +14,31 @@ var TeacherServices = {};
 /**
  * Create a new Teacher 
  */
-TeacherServices.createTeacher = teacher => {
-    return new Promise((resolve, reject) => {
-        teacher.id = uuidV4();
-        teacher.acceptGameRules = false;
-        teacher.state = TeacheState.SIGN_UP.value;
-        Teacher.create(teacher, function (err, newTeacher) {
-            if (err) {
-                reject(err);
-            }
-            else {
-                ScheduleServices.createSchedule({ id: teacher.id });
-                resolve(newTeacher);
-            }
+TeacherServices.createTeacher = async teacher => {
+    try {
+        await TeacherServices.getTeacherByEmail(teacher.email);
+        return Promise.reject('Este correo ya está asociado a otro profesor.');
+    } catch (err) {
+        return new Promise((resolve, reject) => {
+            teacher.id = uuidV4();
+            teacher.acceptGameRules = false;
+            teacher.state = TeacheState.SIGN_UP.value;
+            Teacher.create(teacher, function (err, newTeacher) {
+                if (err) { reject(err); }
+                else {
+                    ScheduleServices.createSchedule({ id: teacher.id });
+
+                    var sqsAttributes = {
+                        MailType: { DataType: 'String', StringValue: MailType.TEACHER_SIGN_UP.key },
+                        Mail: { DataType: 'String', StringValue: teacher.email }
+                    };
+                    SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(teacher), null, sqsAttributes);
+
+                    resolve(newTeacher);
+                }
+            });
         });
-    });
+    }
 };
 
 /**
