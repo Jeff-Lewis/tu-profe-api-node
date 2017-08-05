@@ -1,5 +1,6 @@
 var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
+var config = require('../config');
 
 var Schedule = require('../models/schedule');
 
@@ -68,7 +69,10 @@ ScheduleServices.addSection = (scheduleId, newSection) => {
                 return Promise.reject('Una sección de horario no puede ser menor a 2 horas');
             } else if (-1 >= newSection.day || newSection.day >= 7) {
                 return Promise.reject('La sección no pertenece a un día invalido');
+            } else if (newSection.startTime < config.schedule.startTimeLimit.value || newSection.endTime > config.schedule.endTimeLimit.value) {
+                return Promise.reject(`No olvides que el horario de TuProfe para las asesorías es de ${config.schedule.startTimeLimit.string} a ${config.schedule.endTimeLimit.string}.`);
             }
+            console.log(newSection);
 
             var day = schedule.days.find(day => { return day.day === newSection.day; });
             var validSection = day.sections.every(section => {

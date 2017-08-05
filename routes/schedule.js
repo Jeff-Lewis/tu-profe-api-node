@@ -18,7 +18,9 @@ var routes = function (Schedule) {
             var section = req.body;
             ScheduleServices.addSection(scheduleId, section)
                 .then(schedule => res.status(200).send(schedule))
-                .catch(err => res.status(500).send(err));
+                .catch(err => {
+                    res.status(500).send(err);
+                });
         })
         .delete((req,res)=>{
             var scheduleId = req.params.scheduleId;
