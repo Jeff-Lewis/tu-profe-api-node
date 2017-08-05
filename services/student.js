@@ -66,7 +66,7 @@ StudentServices.getStudentByEmail = email => {
 StudentServices.updateStudent = (studentId, studentUpdated) => {
     return StudentServices.getStudentById(studentId)
         .then(student => {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => {                
                 student = new Student(studentUpdated);
                 student.save(err => {
                     if (err) {

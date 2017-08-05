@@ -17,6 +17,7 @@ var studentSchema = new Schema({
     city: String,
     neighborhood: String,
     address: String,
+    school: Object
 });
 
 module.exports = dynamoose.model('Student', studentSchema);
