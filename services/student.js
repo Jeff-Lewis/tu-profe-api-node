@@ -1,5 +1,6 @@
 var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
+var NodeGeocoder = require('node-geocoder');
 var config = require('../config');
 
 var Student = require('../models/student');
@@ -8,6 +9,7 @@ var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
 
 var StudentServices = {};
+var geocoder = NodeGeocoder(config.geocoderOptions);
 
 StudentServices.createStudent = async student => {
 
@@ -64,9 +66,30 @@ StudentServices.getStudentByEmail = email => {
 };
 
 StudentServices.updateStudent = (studentId, studentUpdated) => {
-    return StudentServices.getStudentById(studentId)
-        .then(student => {
-            return new Promise((resolve, reject) => {                
+    return Promise.all([
+        geocoder.geocode(`${studentUpdated.city.name}, ${studentUpdated.address}`),
+        StudentServices.getStudentById(studentId)
+    ])
+        .then(values => {
+            var geoInfo = values[0][0];
+            var student = values[1];
+            console.log(JSON.stringify(geoInfo));
+            if (geoInfo !== null) {
+                studentUpdated.geoInfo = {
+                    city: geoInfo.city,
+                    country: geoInfo.country,
+                    countryCode: geoInfo.countryCode,
+                    zipcode: geoInfo.zipcode,
+                    formattedAddress: geoInfo.formattedAddress,
+                    latitude: geoInfo.latitude,
+                    longitude: geoInfo.longitude,
+                    neighborhood: geoInfo.extra.neighborhood
+                };
+            } else {
+                studentUpdated.geoInfo = null;
+            }
+
+            return new Promise((resolve, reject) => {
                 student = new Student(studentUpdated);
                 student.save(err => {
                     if (err) {
@@ -79,6 +102,7 @@ StudentServices.updateStudent = (studentId, studentUpdated) => {
                 });
             });
         });
+
 };
 
 StudentServices.updatePhoto = (studentId, photo) => {

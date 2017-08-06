@@ -14,9 +14,14 @@ var studentSchema = new Schema({
     cellPhone: String,
     phone: String,
     state: Number,
-    city: String,
+
+    //Location Address
+    city: Object,
     neighborhood: String,
     address: String,
+    geoInfo: Object,
+
+    //Academical Info
     school: Object,
     profession: Object,
     academicalLevel: Number

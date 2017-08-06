@@ -13,5 +13,10 @@ module.exports = {
             value: 2200,
             string: '10:00 PM'
         }
+    },
+    geocoderOptions : {
+        provider: 'google',
+        //apiKey: 'AIzaSyAQTbAu7Gw9icagUzEEcEidNt9REtWQ1EU', 
+        formatter: 'json'
     }
 };

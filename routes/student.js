@@ -28,6 +28,7 @@ var routes = function (Student) {
                 .then(student => {
                     res.status(200).send(student);
                 }, err => {
+                    console.log(err);
                     res.status(500).send(err);
                 });
         });
