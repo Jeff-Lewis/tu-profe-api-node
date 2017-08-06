@@ -28,38 +28,44 @@ sg.API(request, function(error, response) {
   console.log('Headers: ', response.headers);
 });
 */
-
 /*
+var fs = require('fs');
 var nodemailer = require('nodemailer');
+fs.readFile(__dirname + '/../mailTemplates/test.html', 'utf-8', function (err, file) {
 
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  secure: false,
-  port: 25,
-  auth: {
-    user: 'diego.alfonso.prieto.torres@gmail.com',
-    pass: process.env.TU_PROFE_GMAIL_PASSWORD
-  },
-  tls: {
-    rejectUnauthorized: false
-  }
-});
+  var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    secure: false,
+    port: 25,
+    auth: {
+      user: 'diego.alfonso.prieto.torres@gmail.com',
+      pass: process.env.TU_PROFE_GMAIL_PASSWORD
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
 
-var mailOptions = {
-  from: 'TuProfeNoReply <tu-profe-noreply@gmail.com>',
-  to: 'diego.prieto.torres@hotmail.com',
-  subject: 'Sending Email using Node.js',
-  text: 'That was easy!'
-};
+  var mailOptions = {
+    from: 'TuProfeNoReply <tu-profe-noreply@gmail.com>',
+    to: 'diego.prieto.torres@hotmail.com',
+    subject: 'Sending Email using Node.js',
+    html: file
+  };
 
-transporter.sendMail(mailOptions, function (error, info) {
-  if (error) {
-    console.log(error);
-  } else {
-    console.log('Email sent: ' + info.response);
-  }
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 });
 */
+
+
+
+
 
 /*
 var MailType = require('../models/enum/mailType');
@@ -87,16 +93,17 @@ MailTemplateServices.getMailTemplateById('STUDENT_SIGN_UP')
   .catch(err => console.log(err));
 */
 
+
 var SQSServices = require('../services/sqs');
 var MailType = require('../models/enum/mailType');
 var config = require('../config');
 
 var student = {
   name: 'diego',
-  email: 'diego.prieto.torres@hotmail.com'
+  email: 'fidel.olarte@tu-profe.com'
 }
 var sqsAttributes = {
-  MailType: { DataType: 'String', StringValue: MailType.STUDENT_SIGN_UP.key },
+  MailType: { DataType: 'String', StringValue: MailType.TEACHER_SIGN_UP.key },
   Mail: { DataType: 'String', StringValue: student.email }
 };
 SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
