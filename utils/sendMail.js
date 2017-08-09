@@ -100,10 +100,10 @@ var config = require('../config');
 
 var student = {
   name: 'diego',
-  email: 'fidel.olarte@tu-profe.com'
+  email: 'melissapesa@unisabana.edu.co'
 }
 var sqsAttributes = {
-  MailType: { DataType: 'String', StringValue: MailType.TEACHER_SIGN_UP.key },
+  MailType: { DataType: 'String', StringValue: MailType.STUDENT_SIGN_UP.key },
   Mail: { DataType: 'String', StringValue: student.email }
 };
 SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
