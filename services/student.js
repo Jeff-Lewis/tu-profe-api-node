@@ -5,9 +5,9 @@ var config = require('../config');
 
 var Student = require('../models/student');
 var MailType = require('../models/enum/mailType');
+var LogService = require("../services/log")();
 var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
-var LogService = require("../services/log");
 
 var StudentServices = {};
 var geocoder = NodeGeocoder(config.geocoderOptions);

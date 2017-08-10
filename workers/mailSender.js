@@ -5,6 +5,7 @@ var config = require('../config');
 var MailTemplateServices = require('../services/mailTemplate');
 var NodemailerServices = require('../services/nodemailer');
 var UtilsServices = require('../services/utils');
+var LogService = require("../services/log")();
 
 var app = Consumer.create({
     queueUrl: config.queues.mailQueue,
@@ -16,14 +17,16 @@ var app = Consumer.create({
         var data = JSON.parse(message.Body);
         console.log('--------------------------------------------------');
         console.log(`Start Process : ${new Date()}`);
+        LogService.log("mailSender","send","Start Process", "info", message);
 
         Promise.all([
             UtilsServices.readFile(`${__dirname}/../mailTemplates/${message.MessageAttributes.MailType.StringValue}.html`),
             MailTemplateServices.getMailTemplateById(message.MessageAttributes.MailType.StringValue)
         ])
             .then(values => {
-                htmlContent = values[0];
-                mailTemplate = values[1];
+                var htmlContent = values[0];
+                var mailTemplate = values[1];
+                
                 htmlContent = eval('`' + htmlContent + '`');
 
                 var mailOptions = {
@@ -34,7 +37,8 @@ var app = Consumer.create({
                 };
                 return NodemailerServices.sendMail(mailOptions);
             })
-            .catch(err => console.log(err));
+            .then(()=>LogService.log("mailSender","send","Finish Process Success", "info", {}))
+            .catch(err => LogService.log("mailSender","send","Finish Process Error", "err", err));
 
         return done();
 

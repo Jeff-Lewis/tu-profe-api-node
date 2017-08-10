@@ -1,9 +1,17 @@
 var Logger = require('le_node');
 var Promise = require('promise');
 
-var log = new Logger({token:process.env.LOG_ENTRIES});
-
 var LogService = {};
+
+var LogServiceConstructor = (logEntriesToken) => {
+    
+    if(logEntriesToken){
+        LogService.logger = new Logger({token:logEntriesToken});
+    }else{
+        LogService.logger = new Logger({token:process.env.LOG_ENTRIES});
+    }
+    return LogService;
+}
 
 LogService.log = (fileName, functionName, message, status, data) => {
     return new Promise((resolve,reject)=>{
@@ -17,24 +25,14 @@ LogService.log = (fileName, functionName, message, status, data) => {
         logEntry = JSON.stringify(logEntry);
         switch (status) {
             case 'err':
-                log.err(logEntry);
+                LogService.logger.err(logEntry);
                 break;
             default:
-                log.info(logEntry);
+                LogService.logger.info(logEntry);
                 break;
         } 
         resolve();
     });
 };
 
-var getLogEntry = () => {
-    return {
-      fileName:"",
-      functionName:"",
-      message:"",
-      status:"",
-      data:{}
-    };
-}
-
-module.exports = LogService;
+module.exports = LogServiceConstructor;

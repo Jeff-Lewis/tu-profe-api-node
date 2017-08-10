@@ -7,8 +7,8 @@ NodemailerServices.sendMail = (mailOptions) => {
     return new Promise((resolve, reject) => {
         var transporter = getTransporter();
         transporter.sendMail(mailOptions, function (error, info) {
-            if (err) {
-                reject(err);
+            if (error) {
+                reject(error);
             } else {
                 resolve(info);
             }

@@ -9,14 +9,15 @@ var AdvisoryServiceState = require('../models/enum/advisoryServiceState');
 var SessionState = require('../models/enum/sessionState');
 var TeacheState = require('../models/enum/teacherState');
 
-var CourseServices = require('../services/course');
-var CostConfigServices = require('../services/costConfig');
 var NotificationServices = require('../services/notification');
-var UtilsServices = require('../services/utils');
+var CostConfigServices = require('../services/costConfig');
 var ScheduleServices = require('../services/schedule');
 var TeacherServices = require('../services/teacher');
-var S3Services = require('../services/s3');
+var CourseServices = require('../services/course');
+var UtilsServices = require('../services/utils');
+var LogService = require("../services/log")();
 var SQSServices = require('../services/sqs');
+var S3Services = require('../services/s3');
 var AdvisoryServiceServices = {};
 
 /**
@@ -54,9 +55,13 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                     };
                 });
                 AdvisoryService.create(advisoryService, function (err, newAdvisoryService) {
-                    if (err) reject(err);
+                    if (err) {
+                        LogService.log('AdvisoryService','createAdvisoryService','error', 'err', newAdvisoryService);
+                        reject(err);
+                    }
                     else {
                         AdvisoryServiceServices.sendNotification(newAdvisoryService);
+                        LogService.log('AdvisoryService','createAdvisoryService','info', 'info', newAdvisoryService);
                         resolve(newAdvisoryService);
                     }
                 });
