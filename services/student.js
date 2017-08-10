@@ -7,6 +7,7 @@ var Student = require('../models/student');
 var MailType = require('../models/enum/mailType');
 var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
+var LogService = require("../services/log");
 
 var StudentServices = {};
 var geocoder = NodeGeocoder(config.geocoderOptions);
@@ -15,7 +16,9 @@ StudentServices.createStudent = async student => {
 
     try {
         await StudentServices.getStudentByEmail(student.email);
-        return Promise.reject('Este correo ya está asociado a otro estudiante.');
+        var error = 'Este correo ya está asociado a otro estudiante.';
+        LogService.log('StudentServices','createStudent','error', 'err', student);
+        return Promise.reject(error);
     } catch (error) {
         return new Promise((resolve, reject) => {
             student.id = uuidV4();

@@ -93,7 +93,7 @@ MailTemplateServices.getMailTemplateById('STUDENT_SIGN_UP')
   .catch(err => console.log(err));
 */
 
-
+/*
 var SQSServices = require('../services/sqs');
 var MailType = require('../models/enum/mailType');
 var config = require('../config');
@@ -107,3 +107,4 @@ var sqsAttributes = {
   Mail: { DataType: 'String', StringValue: student.email }
 };
 SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
+*/
