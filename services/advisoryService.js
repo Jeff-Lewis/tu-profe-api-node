@@ -362,7 +362,7 @@ AdvisoryServiceServices.getAvailableServices = (teacherId) => {
         .then(teacher => {
             var params = {
                 courseId: { in: teacher.courses },
-                state: { eq: 1 }
+                state: { eq: 3 }
             };
             return Promise.all([
                 ScheduleServices.getScheduleById(teacherId),
