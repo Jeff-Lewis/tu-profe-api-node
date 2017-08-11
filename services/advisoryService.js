@@ -2,31 +2,47 @@ var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
 var moment = require('moment');
 var config = require('../config');
+var NodeGeocoder = require('node-geocoder');
 
+/* Models */
 var AdvisoryService = require('../models/advisoryService');
 var AdvisoryServiceType = require('../models/enum/advisoryServiceType');
 var AdvisoryServiceState = require('../models/enum/advisoryServiceState');
+
+/* Enums */
 var SessionState = require('../models/enum/sessionState');
 var TeacheState = require('../models/enum/teacherState');
+var MailType = require('../models/enum/mailType');
 
+/* Services */
 var NotificationServices = require('../services/notification');
 var CostConfigServices = require('../services/costConfig');
 var ScheduleServices = require('../services/schedule');
+var StudentServices = require('../services/student');
 var TeacherServices = require('../services/teacher');
 var CourseServices = require('../services/course');
 var UtilsServices = require('../services/utils');
 var LogService = require("../services/log")();
 var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
+var geocoder = NodeGeocoder(config.geocoderOptions);
 var AdvisoryServiceServices = {};
 
 /**
  * Create advisory Service
  */
 AdvisoryServiceServices.createAdvisoryService = advisoryService => {
-    return AdvisoryServiceServices.validate(advisoryService)
-        .then(advisoryService => AdvisoryServiceServices.calculate(advisoryService))
-        .then(advisoryService => {
+    return Promise.all([
+        AdvisoryServiceServices.validate(advisoryService),
+        StudentServices.getStudentById(advisoryService.studentId),
+        geocoder.geocode(`${advisoryService.city.name}, ${advisoryService.address}`),
+        AdvisoryServiceServices.calculate(advisoryService)
+    ])
+        .then(values => {
+            var student = values[1];
+            var geoInfo = values[2][0];
+            advisoryService = values[3];
+
             return new Promise((resolve, reject) => {
                 advisoryService.state = AdvisoryServiceState.CREATED.value;
                 advisoryService.id = uuidV4();
@@ -36,10 +52,7 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                 advisoryService.sessions = advisoryService.sessions.map((session, index) => {
                     var startTime = session.startTime.split(':');
                     var startDate = moment(session.startDate);
-                    startDate.set({
-                        hour: parseInt(startTime[0]),
-                        minute: parseInt(startTime[1])
-                    });
+                    startDate.set({ hour: parseInt(startTime[0]), minute: parseInt(startTime[1]) });
 
                     var endDate = moment(startDate);
                     endDate.add(session.duration, 'm');
@@ -54,14 +67,29 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                         state: SessionState.PENDING.value
                     };
                 });
+                advisoryService.geoInfo = {
+                    city: geoInfo.city,
+                    country: geoInfo.country,
+                    countryCode: geoInfo.countryCode,
+                    zipcode: geoInfo.zipcode,
+                    formattedAddress: geoInfo.formattedAddress,
+                    latitude: geoInfo.latitude,
+                    longitude: geoInfo.longitude,
+                    neighborhood: geoInfo.extra.neighborhood
+                };
                 AdvisoryService.create(advisoryService, function (err, newAdvisoryService) {
                     if (err) {
-                        LogService.log('AdvisoryService','createAdvisoryService','error', 'err', newAdvisoryService);
+                        LogService.log('AdvisoryService', 'createAdvisoryService', 'error', 'err', newAdvisoryService);
                         reject(err);
                     }
                     else {
+                        var sqsAttributes = {
+                            MailType: { DataType: 'String', StringValue: MailType.SERVICE_CREATED.key },
+                            Mail: { DataType: 'String', StringValue: student.email }
+                        };
+                        SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify({ student: student, advisoryService: newAdvisoryService }), null, sqsAttributes);
                         AdvisoryServiceServices.sendNotification(newAdvisoryService);
-                        LogService.log('AdvisoryService','createAdvisoryService','info', 'info', newAdvisoryService);
+                        LogService.log('AdvisoryService', 'createAdvisoryService', 'info', 'info', newAdvisoryService);
                         resolve(newAdvisoryService);
                     }
                 });

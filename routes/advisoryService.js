@@ -1,6 +1,7 @@
 var express = require('express'),
     multer = require('multer');
 
+var LogService = require("../services/log")();
 var AdvisoryServiceServices = require('../services/advisoryService');
 
 var upload = multer({
@@ -17,9 +18,11 @@ var routes = AdvisoryService => {
         .post((req, res) => {
             AdvisoryServiceServices.createAdvisoryService(req.body)
                 .then(advisoryService => {
+                    LogService.log('AdvisoryServiceRouter', 'createAdvisoryService', 'info', 'info');
                     res.status(200).send(advisoryService);
                 })
-                .catch(err => {
+                .catch(err => {                    
+                    LogService.log('AdvisoryServiceRouter', 'createAdvisoryService', 'error', 'err', { err: err });
                     res.status(500).send(err);
                 });
         });

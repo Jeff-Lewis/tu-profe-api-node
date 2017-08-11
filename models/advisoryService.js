@@ -18,6 +18,9 @@ var advisoryService = new Schema({
     course: { type: Object },
     courseId: { type: String },
     teacher: { type: Object },
+    address: { type: String },
+    city: { type: Object },
+    geoInfo: { type: Object },
 
     //Tutor 
     months: { type: Number, default: 1 },
