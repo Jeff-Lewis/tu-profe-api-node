@@ -17,13 +17,14 @@ StudentServices.createStudent = async student => {
     try {
         await StudentServices.getStudentByEmail(student.email);
         var error = 'Este correo ya está asociado a otro estudiante.';
-        LogService.log('StudentServices','createStudent','error', 'err', student);
+        LogService.log('StudentServices', 'createStudent', 'error', 'err', student);
         return Promise.reject(error);
     } catch (error) {
         return new Promise((resolve, reject) => {
             student.id = uuidV4();
             Student.create(student, (err, newStudent) => {
                 if (err) {
+                    LogService.log('StudentServices', 'createStudent', 'error', 'err', { student: student, err: err });
                     reject(err);
                 }
                 else {
@@ -76,7 +77,7 @@ StudentServices.updateStudent = (studentId, studentUpdated) => {
         .then(values => {
             var geoInfo = values[0][0];
             var student = values[1];
-            console.log(JSON.stringify(geoInfo));
+
             if (geoInfo !== null) {
                 studentUpdated.geoInfo = {
                     city: geoInfo.city,
@@ -96,10 +97,11 @@ StudentServices.updateStudent = (studentId, studentUpdated) => {
                 student = new Student(studentUpdated);
                 student.save(err => {
                     if (err) {
-                        console.log(err);
+                        LogService.log('StudentServices', 'updateStudent', 'error', 'err', { student: studentUpdated, err: err });
                         reject(err)
                     }
                     else {
+                        LogService.log('StudentServices', 'updateStudent', 'info', 'info', student);
                         resolve(student)
                     }
                 });

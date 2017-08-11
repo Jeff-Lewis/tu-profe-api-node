@@ -15,10 +15,11 @@ var teacherSchema = new Schema({
     cellPhone: String,
     phone: String,
     state: Number,
-    city: String,
+    city: Object,
     neighborhood: String,
     address: String,
     profileDescription: String,
+    geoInfo: Object,
 
     //Academical Data
     university: String,

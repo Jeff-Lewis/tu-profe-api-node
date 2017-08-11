@@ -1,5 +1,6 @@
 var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
+var NodeGeocoder = require('node-geocoder');
 var config = require('../config');
 
 var Teacher = require('../models/teacher');
@@ -8,6 +9,8 @@ var MailType = require('../models/enum/mailType');
 var ScheduleServices = require('../services/schedule');
 var SQSServices = require('../services/sqs');
 var S3Services = require('../services/s3');
+var LogService = require("../services/log")();
+var geocoder = NodeGeocoder(config.geocoderOptions);
 var TeacherServices = {};
 
 
@@ -78,13 +81,40 @@ TeacherServices.getLinkUpTeachers = () => {
 };
 
 TeacherServices.updateTeacher = (teacherId, teacherUpdated) => {
-    return TeacherServices.getTeacherById(teacherId)
-        .then(teacher => {
+    return Promise.all([
+        geocoder.geocode(`${teacherUpdated.city.name}, ${teacherUpdated.address}`),
+        TeacherServices.getTeacherById(teacherId)
+    ])
+        .then(values => {
+            var geoInfo = values[0][0];
+            var teacher = values[1];
+
+            if (geoInfo !== null) {
+                teacherUpdated.geoInfo = {
+                    city: geoInfo.city,
+                    country: geoInfo.country,
+                    countryCode: geoInfo.countryCode,
+                    zipcode: geoInfo.zipcode,
+                    formattedAddress: geoInfo.formattedAddress,
+                    latitude: geoInfo.latitude,
+                    longitude: geoInfo.longitude,
+                    neighborhood: geoInfo.extra.neighborhood
+                };
+            } else {
+                teacherUpdated.geoInfo = null;
+            }
+
             return new Promise((resolve, reject) => {
                 teacher = new Teacher(teacherUpdated);
                 teacher.save(err => {
-                    if (err) { reject(err) }
-                    else { resolve(teacher) }
+                    if (err) {
+                        LogService.log('TeacherServices', 'updateTeacher', 'error', 'err', { teacher: teacherUpdated, err: err });
+                        reject(err);
+                    }
+                    else {
+                        LogService.log('TeacherServices', 'updateTeacher', 'info', 'info', teacher);
+                        resolve(teacher);
+                    }
                 });
             });
         });

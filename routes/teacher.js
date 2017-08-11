@@ -2,6 +2,7 @@ var express = require('express'),
     multer = require('multer'),
     path = require('path');
 
+var LogService = require("../services/log")();
 var TeacherService = require('../services/teacher');
 
 var upload = multer({ dest: '..uploads/' })
@@ -24,6 +25,7 @@ var routes = function (Teacher) {
                 .then(teacher => {
                     res.status(200).send(teacher);
                 }, err => {
+                    LogService.log('TeacherRoute', 'updateTeacher', 'error', 'err', { teacher: teacher, err: err });
                     res.status(500).send(err);
                 });
         });
