@@ -20,6 +20,7 @@ var School = require('./models/school'),
     Training = require('./models/training'),
     Notification = require('./models/notification'),
     AdvisoryService = require('./models/advisoryService'),
+    Payment = require('./models/payment'),
     City = require('./models/city');    
 
 var app = express();
@@ -55,6 +56,7 @@ interviewRouter = require('./routes/interview')(Interview);
 notificationRoute = require('./routes/notification')(Notification);
 trainingRoute = require('./routes/training')(Training);
 advisoryServiceRoute = require('./routes/advisoryService')(AdvisoryService);
+paymentRoute = require('./routes/payment')(Payment);
 cityRoute = require('./routes/city')(City);
 
 app.use('/api/session', sessionRouter);
@@ -69,6 +71,7 @@ app.use('/api/interviews', interviewRouter);
 app.use('/api/trainings', trainingRoute);
 app.use('/api/notifications', notificationRoute);
 app.use('/api/advisory-services', advisoryServiceRoute);
+app.use('/api/payments', paymentRoute);
 app.use('/api/cities', cityRoute);
 
 app.listen(port, function () {
