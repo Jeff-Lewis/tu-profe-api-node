@@ -1,6 +1,7 @@
 var uuidV4 = require('uuid/v4');
 var Promise = require('promise');
 var moment = require('moment');
+var md5 = require('md5');
 var config = require('../config');
 var NodeGeocoder = require('node-geocoder');
 
@@ -290,6 +291,10 @@ AdvisoryServiceServices.getAllByStudentId = studentId => {
         AdvisoryService.scan('studentId').eq(studentId).exec((err, services) => {
             if (err) reject(err);
             else {
+                services.map(service => {                    
+                    service.signature = md5(`${process.env.P_CUST_ID_CLIENTE}^${process.env.P_KEY}^${service.id}^${service.cost.total}^COP`);
+                    return service;
+                });                
                 resolve(services);
             }
         });
