@@ -7,13 +7,13 @@ var NodeGeocoder = require('node-geocoder');
 
 /* Models */
 var AdvisoryService = require('../models/advisoryService');
-var AdvisoryServiceType = require('../models/enum/advisoryServiceType');
-var AdvisoryServiceState = require('../models/enum/advisoryServiceState');
 
 /* Enums */
-var SessionState = require('../models/enum/sessionState');
-var TeacheState = require('../models/enum/teacherState');
 var MailType = require('../models/enum/mailType');
+var TeacheState = require('../models/enum/teacherState');
+var SessionState = require('../models/enum/sessionState');
+var AdvisoryServiceType = require('../models/enum/advisoryServiceType');
+var AdvisoryServiceState = require('../models/enum/advisoryServiceState');
 
 /* Services */
 var NotificationServices = require('../services/notification');
@@ -90,7 +90,7 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                         };
                         SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify({ student: student, advisoryService: newAdvisoryService }), null, sqsAttributes);
                         AdvisoryServiceServices.sendNotification(newAdvisoryService);
-                        LogService.log('AdvisoryService', 'createAdvisoryService', 'info', 'info', newAdvisoryService);
+                        LogService.log('AdvisoryService', 'createAdvisoryService', 'info', 'info', {});
                         resolve(newAdvisoryService);
                     }
                 });

@@ -1,26 +1,24 @@
 var express = require('express');
 
+var LogService = require("../services/log")();
+var PaymentServices = require('../services/payment');
+
 var routes = function (Payment) {
     var paymentRouter = express.Router();
 
     paymentRouter.route('/')
-        .get(function (req, res) {
-            Payment.scan().exec(function (err, payments) {
-                if (err)
-                    res.status(500).send(err);
-                else
-                    res.send(payments);
-            });
-        })
         .post(function (req, res) {
-            var payment = new Payment(req.body);
-            console.log(payment);
-            Payment.create(payment, function (err, newPayment) {
-                if (err)
-                    res.status(500).send(err);
-                else
-                    res.status(201).send(payment);
-            });
+            var payment = { epayCoInfo: req.body };
+            PaymentServices.createPayment(payment)
+                .then(newPayment => {
+                    LogService.log('PaymentRouter', 'createPayment', 'info', 'info');
+                    res.status(200).send(newPayment);
+                })
+                .catch(err => {
+                    console.log(err);
+                    LogService.log('PaymentRouter', 'createPayment', 'error', 'err', err);
+                    res.status(500).send(newPayment);
+                });
         });
 
     paymentRouter.route('/:id')

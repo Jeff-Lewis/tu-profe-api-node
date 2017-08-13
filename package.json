@@ -37,6 +37,7 @@
     "nodemailer": "^4.0.1",
     "promise": "^7.1.1",
     "sendgrid": "^5.1.1",
+    "sha256": "^0.2.0",
     "sqs-consumer": "^3.6.1",
     "uuid": "^3.0.1"
   }

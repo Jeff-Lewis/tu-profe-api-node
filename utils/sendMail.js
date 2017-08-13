@@ -93,7 +93,7 @@ MailTemplateServices.getMailTemplateById('STUDENT_SIGN_UP')
   .catch(err => console.log(err));
 */
 
-
+/*
 var SQSServices = require('../services/sqs');
 var MailType = require('../models/enum/mailType');
 var config = require('../config');
@@ -107,4 +107,49 @@ var sqsAttributes = {
   Mail: { DataType: 'String', StringValue: student.email }
 };
 SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
+*/
 
+var data = {
+  x_cust_id_cliente: '13529',
+  x_ref_payco: '374136',
+  x_id_factura: 'd1040e17-26c2-492a-86ad-63679892a592',
+  x_id_invoice: 'd1040e17-26c2-492a-86ad-63679892a592',
+  x_description: 'Servicio de AcompaÃ±amiento de TuProfe',
+  x_amount: '304900',
+  x_amount_country: '304900',
+  x_amount_ok: '304900',
+  x_tax: '0',
+  x_amount_base: '0',
+  x_currency_code: 'COP',
+  x_bank_name: 'Banco de Pruebas',
+  x_cardnumber: '457562*******0326',
+  x_quotas: '12',
+  x_respuesta: 'Aceptada',
+  x_response: 'Aceptada',
+  x_approval_code: '000000',
+  x_transaction_id: '374136',
+  x_fecha_transaccion: '2017-08-12 20:46:47',
+  x_transaction_date: '2017-08-12 20:46:47',
+  x_cod_respuesta: '1',
+  x_cod_response: '1',
+  x_response_reason_text: '00-Aprobada',
+  x_errorcode: '00',
+  x_franchise: 'VS',
+  x_extra1: '',
+  x_extra2: '',
+  x_extra3: '',
+  x_business: 'DIEGO ALFONSO PRIETO TORRES ',
+  x_customer_doctype: 'CC',
+  x_customer_document: '1020788372',
+  x_customer_name: 'd',
+  x_customer_lastname: 'p',
+  x_customer_email: 'diego.prieto.torres@hotmail.com',
+  x_customer_phone: '3156162527',
+  x_customer_country: 'CO',
+  x_customer_city: 'Bogota',
+  x_customer_address: 'calle 186a 19 26',
+  x_customer_ip: '186.145.175.64',
+  x_signature: '11afa3f056d7f811f7d42009cf90f48a74a35baa481b1d56fa41c94a53909dc5',
+  x_test_request: 'TRUE' };
+
+  console.log(JSON.stringify(data));
