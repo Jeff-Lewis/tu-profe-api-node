@@ -1,15 +1,23 @@
 var express = require('express');
 
+var LogService = require("../services/log")();
 var AdvisorySessionServices = require('../services/advisorySession');
 
-var routes = AdvisorySession => {
+var routes = () => {
     var advisorySessionRouter = express.Router();
 
     advisorySessionRouter.route('/:advisoryServiceId/:sessionId')
         .put((req, res) => {
             AdvisorySessionServices.updateAdvisorySession(req.params.advisoryServiceId, req.params.sessionId, req.body)
-                .then(response => res.status(200).send(response))
-                .catch(err => res.status(500).send(err));
+                .then(response => {
+                    LogService.log('AdvisorySessionRouter', 'updateAdvisoryService', 'info', 'info');
+                    res.status(200).send();
+                })
+                .catch(err => {
+                    console.log(err);
+                    LogService.log('AdvisorySessionRouter', 'updateAdvisoryService', 'error', 'err', { err: err });
+                    res.status(500).send(err);
+                });
         });
 
     return advisorySessionRouter;

@@ -56,6 +56,7 @@ interviewRouter = require('./routes/interview')(Interview);
 notificationRoute = require('./routes/notification')(Notification);
 trainingRoute = require('./routes/training')(Training);
 advisoryServiceRoute = require('./routes/advisoryService')(AdvisoryService);
+advisorySessionRoute = require('./routes/advisorySession')();
 paymentRoute = require('./routes/payment')(Payment);
 cityRoute = require('./routes/city')(City);
 
@@ -71,6 +72,7 @@ app.use('/api/interviews', interviewRouter);
 app.use('/api/trainings', trainingRoute);
 app.use('/api/notifications', notificationRoute);
 app.use('/api/advisory-services', advisoryServiceRoute);
+app.use('/api/advisory-sessions', advisorySessionRoute);
 app.use('/api/payments', paymentRoute);
 app.use('/api/cities', cityRoute);
 

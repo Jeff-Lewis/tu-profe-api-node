@@ -120,6 +120,7 @@ AdvisoryServiceServices.getAdvisoryServiceById = advisoryServiceId => {
  * Get multiple Advisry Services that match with the params
  */
 AdvisoryServiceServices.filterByParams = params => {
+    console.log(params);
     return new Promise((resolve, reject) => {
         AdvisoryService.scan(params, function (err, advisoryServices) {
             if (err) reject(err);
@@ -131,11 +132,11 @@ AdvisoryServiceServices.filterByParams = params => {
 /**
  * Update advisory Service
  */
-AdvisoryServiceServices.updateAdvisoryService = (advisoryServiceId, advisoryServiceUpdated) => {
+AdvisoryServiceServices.updateAdvisoryService = (advisoryServiceId, advisoryServiceUpdated) => {    
     return AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId)
         .then(advisoryService => {
             return new Promise((resolve, reject) => {
-                advisoryService = new AdvisoryService(advisoryServiceUpdated);
+                advisoryService = new AdvisoryService(advisoryServiceUpdated);                
                 advisoryService.save(err => {
                     if (err) {
                         reject(err)
