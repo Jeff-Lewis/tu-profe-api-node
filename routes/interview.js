@@ -1,8 +1,9 @@
-var express = require('express'),
-    uuidV4 = require('uuid/v4');
+var express = require('express');
+var uuidV4 = require('uuid/v4');
 
-var TeacherService = require('../services/teacher'),
-    InterviewService = require('../services/interview');
+var LogService = require("../services/log")();    
+var TeacherService = require('../services/teacher');
+var InterviewService = require('../services/interview');
 
 var routes = function (Interview) {
     var interviewRouter = express.Router();
@@ -59,9 +60,11 @@ var routes = function (Interview) {
 
             InterviewService.takePlace(interviewId, teacherId)
                 .then(() => {
+                    LogService.log('InterviewRouter', 'takePlace', 'info', 'info');
                     res.status(200).send();
                 })
-                .catch((err) => {
+                .catch((err) => {                    
+                    LogService.log('InterviewRouter', 'takePlace', 'error', 'err', err);
                     res.status(500).send(err);
                 });
         });
