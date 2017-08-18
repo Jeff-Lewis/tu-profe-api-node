@@ -65,7 +65,8 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
                         endTime: endDate.format('HH:mm'),
                         duration: session.duration,
                         dayOfWeek: new Date(session.startDate).getDay(),
-                        state: SessionState.PENDING.value
+                        state: SessionState.PENDING.value,
+                        realDuration: 0
                     };
                 });
                 advisoryService.geoInfo = {

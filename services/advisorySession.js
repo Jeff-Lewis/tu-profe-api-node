@@ -14,6 +14,7 @@ AdvisorySessionServices.updateAdvisorySession = (advisoryServiceId, sessionId, s
                 return Promise.reject('La sesion esta terminada o cancelada y no puede ser editada');
             } else if (sessionUpdated.state === SessionState.IN_PROCESS.value) {
                 session.inProgressTime = new Date();
+                session.teacher = advisoryService.teacher;
             } else if (sessionUpdated.state === SessionState.FINISHED.value) {
                 session.finishedTime = new Date();
                 session.realDuration = session.finishedTime - new Date(session.inProgressTime);
