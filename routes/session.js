@@ -67,6 +67,16 @@ var routes = function (Teacher, Student, Admin) {
                 res.status(500).send(err);
             });
     });
+
+    sessionRoute.post('/restore-password', (req, res) => {
+        SessionServices.restorePassword(req.body.userType, req.body.nonce, req.body.password)
+            .then(response => {
+                res.status(201).send(response);
+            }, err => {
+                console.log(err);
+                res.status(500).send(err);
+            });
+    });
     return sessionRoute;
 };
 

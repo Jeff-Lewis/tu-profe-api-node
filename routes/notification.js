@@ -14,9 +14,8 @@ var routes = Notification => {
                     res.send(notifications);
             });
         })
-        .post((req, res) => {
-            var notification = req.body;
-            NotificationServices.createNotification(notification)
+        .post((req, res) => {            
+            NotificationServices.createNotification(req.body)
                 .then(newNotification => {
                     res.status(201).send(notification);
                 })

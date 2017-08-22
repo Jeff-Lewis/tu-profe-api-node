@@ -51,7 +51,7 @@ SessionServices.signUpUser = (userType, user) => {
 };
 
 SessionServices.forgotPassword = async (userType, email) => {
-    var user = null;    
+    var user = null;
     switch (userType) {
         case 'Teacher':
             user = await TeacherService.getTeacherByEmail(email);
@@ -68,10 +68,36 @@ SessionServices.forgotPassword = async (userType, email) => {
         Mail: { DataType: 'String', StringValue: email }
     };
     var data = {
+        nonce: user.id,
         name: user.name,
-        url: 'http://localhost:8081/'
+        userType: userType,
+        url: `${config.frontHost}#!/restore-password`
     }
-    return SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(data), null, sqsAttributes);    
+    return SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(data), null, sqsAttributes);
+};
+
+SessionServices.restorePassword = (userType, nonce, password) => {    
+    return UtilsServices.crypt(password)
+        .then(password => {
+            switch (userType) {
+                case 'Teacher':
+                    TeacherService.getTeacherById(nonce)
+                        .then(teacher => {
+                            teacher.password = password;
+                            TeacherService.updateTeacher(teacher.id, teacher);
+                        });
+                    break;
+                case 'Student':
+                    StudentServices.getStudentById(nonce)
+                        .then(student => {
+                            student.password = password;
+                            StudentServices.updateStudent(student.id, student);
+                        });
+                    break;
+                default:
+                    return Promise.reject('El tipo de usuario no es valido');
+            }
+        });
 };
 
 module.exports = SessionServices;

@@ -1,6 +1,8 @@
 var express = require('express'),
     uuidV4 = require('uuid/v4');
 
+var CourseServices = require('../services/course');
+
 var routes = function (Course) {
     var courseRouter = express.Router();
 
@@ -14,14 +16,13 @@ var routes = function (Course) {
             });
         })
         .post(function (req, res) {
-            var course = new Course(req.body);            
-            course.id = uuidV4();            
-            Course.create(course, function (err, newCourse) {
-                if (err)                    
-                    res.status(500).send(err);
-                else
+            CourseServices.createCourse(req.body)
+                .then(course => {
                     res.status(201).send(course);
-            });
+                })
+                .catch(err => {
+                    res.status(500).send(err);
+                });
         });
 
     courseRouter.route('/:id')
