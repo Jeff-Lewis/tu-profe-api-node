@@ -13,7 +13,8 @@ S3.uploadFile = function(bucketName, key, file){
                 var params = {
                     Bucket: bucketName,
                     Key: key,
-                    Body: data
+                    Body: data,
+                    ACL: 'public-read'
                 };
                 s3.upload(params, (err, response) => {
                     if (err) reject(err);
