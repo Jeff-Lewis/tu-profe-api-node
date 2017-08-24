@@ -17,6 +17,7 @@ var app = Consumer.create({
         var data = JSON.parse(message.Body);
         console.log('--------------------------------------------------');
         console.log(`Start Process : ${new Date()}`);
+        console.log(`MailType : ${message.MessageAttributes.MailType.StringValue}`);
         LogService.log("mailSender","send","Start Process", "info", message);
 
         Promise.all([

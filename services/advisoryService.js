@@ -245,13 +245,18 @@ AdvisoryServiceServices.validate = advisoryService => {
         var today = new Date();
         today.setHours(0, 0, 0, 0);
 
+        //Validaciones generales
         if (!advisoryService.description) {
             reject('La descripción no puede estar vacia.');
-        }
-        else if (advisoryService.sessions.length <= 0) {
+        } else if (advisoryService.sessions.length <= 0) {
             reject('Las sesiones no pueden estar vacias.');
+        } else if (!advisoryService.address) {
+            reject('La dirección no puede estar vacia.');
+        } else if (!advisoryService.city) {
+            reject('La ciudad no puede estar vacia.');
         }
 
+        //Validaciones para las sesiones
         advisoryService.sessions.forEach((session, index) => {
             var startTime = session.startTime.split(':');
             if (new Date(session.startDate) < today) {
@@ -263,6 +268,7 @@ AdvisoryServiceServices.validate = advisoryService => {
             }
         });
 
+        //Validaciones por tipo de servicio
         if (advisoryService.type === AdvisoryServiceType.TUTOR.value) {
             if (!(1 <= advisoryService.months && advisoryService.months <= 12)) {
                 reject('La cantidad de meses debe estar entre 1 y 12.');
