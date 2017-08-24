@@ -21,12 +21,12 @@ AssignService.validate = request => {
         .then(values => {
             var advisoryService = values[0];
             var teacher = values[1];
-
-            var teacherHasCourse = !teacher.courses.some(course => {
+            console.log(advisoryService.files);
+            var teacherNoHasCourse = !teacher.courses.some(course => {
                 return course === advisoryService.course.id
             });
 
-            if (teacherHasCourse) {
+            if (teacherNoHasCourse) {
                 return Promise.reject('El profesor no dicta esta materia.')
             } else if (teacher.state !== TeacheState.ACTIVE.value) {
                 return Promise.reject('El profesor esta inactivo');
@@ -50,7 +50,7 @@ AssignService.assign = request => {
     };
 
     request.teacher.advisoryServices.push(request.advisoryService.id);
-
+    console.log(request.advisoryService.files);
     return Promise.all([
         AdvisoryServiceServices.updateAdvisoryService(request.advisoryService.id, request.advisoryService),
         TeacherServices.updateTeacher(request.teacher.id, request.teacher)

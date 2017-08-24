@@ -27,7 +27,8 @@ var advisoryService = new Schema({
     sessionsPerWeek: { type: Number, default: 1 },
 
     //Special    
-    totalFilesSize: { type: Number, default: 0, validate: function (value) { return (value < 0 || value > 25000000) ? false : true } }
+    totalFilesSize: { type: Number, default: 0, validate: function (value) { return (value < 0 || value > 25000000) ? false : true } },
+    files: { type: [String], default: [] },
 });
 
 module.exports = dynamoose.model('AdvisoryService', advisoryService);

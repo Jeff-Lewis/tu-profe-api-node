@@ -104,9 +104,7 @@ AdvisoryServiceServices.createAdvisoryService = advisoryService => {
  */
 AdvisoryServiceServices.getAdvisoryServiceById = advisoryServiceId => {
     return new Promise((resolve, reject) => {
-        AdvisoryService.get({
-            id: advisoryServiceId
-        }, (err, advisoryService) => {
+        AdvisoryService.get({ id: advisoryServiceId }, (err, advisoryService) => {
             if (err || advisoryService === undefined) {
                 reject('Advisory Service not found');
             }
@@ -121,11 +119,12 @@ AdvisoryServiceServices.getAdvisoryServiceById = advisoryServiceId => {
  * Get multiple Advisry Services that match with the params
  */
 AdvisoryServiceServices.filterByParams = params => {
-    console.log(params);
     return new Promise((resolve, reject) => {
         AdvisoryService.scan(params, function (err, advisoryServices) {
             if (err) reject(err);
-            else resolve(advisoryServices);
+            else {
+                resolve(advisoryServices);
+            }
         });
     });
 };
@@ -133,11 +132,11 @@ AdvisoryServiceServices.filterByParams = params => {
 /**
  * Update advisory Service
  */
-AdvisoryServiceServices.updateAdvisoryService = (advisoryServiceId, advisoryServiceUpdated) => {    
+AdvisoryServiceServices.updateAdvisoryService = (advisoryServiceId, advisoryServiceUpdated) => {
     return AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId)
         .then(advisoryService => {
             return new Promise((resolve, reject) => {
-                advisoryService = new AdvisoryService(advisoryServiceUpdated);                
+                advisoryService = new AdvisoryService(advisoryServiceUpdated);
                 advisoryService.save(err => {
                     if (err) {
                         reject(err)
@@ -293,10 +292,10 @@ AdvisoryServiceServices.getAllByStudentId = studentId => {
         AdvisoryService.scan('studentId').eq(studentId).exec((err, services) => {
             if (err) reject(err);
             else {
-                services.map(service => {                    
+                services.map(service => {
                     service.signature = md5(`${process.env.P_CUST_ID_CLIENTE}^${process.env.P_KEY}^${service.id}^${service.cost.total}^COP`);
                     return service;
-                });                
+                });
                 resolve(services);
             }
         });
@@ -320,11 +319,14 @@ AdvisoryServiceServices.uploadFile = (advisoryServiceId, file) => {
     return AdvisoryServiceServices.getAdvisoryServiceById(advisoryServiceId)
         .then(advisoryService => {
             advisoryService.totalFilesSize += file.size;
+            advisoryService.files = advisoryService.files === undefined ? [] : advisoryService.files;
+            advisoryService.files.push(key);
+
             if (advisoryService.totalFilesSize > 25000000) {
                 return Promise.reject('El limite de tamaño de archivos ha sido excedido.');
             }
             else {
-                S3Services.uploadFile(bucketName, key, file);
+                S3Services.uploadFile(bucketName, key, file)
                 return Promise.resolve(advisoryService);
             }
         })
@@ -346,13 +348,13 @@ AdvisoryServiceServices.assign = (advisoryServiceId, teacherId) => {
                 return course === advisoryService.course.id
             });
 
-            /*if (teacherHasCourse) {
+            if (teacherHasCourse) {
                 return Promise.reject('El profesor no dicta esta materia.')
             } else if (teacher.state !== TeacheState.ACTIVE.value) {
                 return Promise.reject('El profesor esta inactivo');
             } else if (advisoryService.state !== AdvisoryServiceState.AVAILABLE.value) {
                 return Promise.reject('La asesoria no esta disponible');
-            }*/
+            }
 
             var message = {
                 id: uuidV4(),
