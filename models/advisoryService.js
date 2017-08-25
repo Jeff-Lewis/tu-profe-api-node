@@ -17,7 +17,7 @@ var advisoryService = new Schema({
     paid: { type: Boolean, required: true, default: false },
     course: { type: Object },
     courseId: { type: String },
-    teacher: { type: Object },
+    teacher: { type: String },
     address: { type: String },
     city: { type: Object },
     geoInfo: { type: Object },

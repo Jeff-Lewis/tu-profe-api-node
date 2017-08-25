@@ -17,8 +17,7 @@ AdvisorySessionServices.updateAdvisorySession = (advisoryServiceId, sessionId, s
                 session.teacher = advisoryService.teacher;
             } else if (sessionUpdated.state === SessionState.FINISHED.value) {
                 session.finishedTime = new Date();
-                session.realDuration = session.finishedTime - new Date(session.inProgressTime);
-                console.log(session.realDuration);
+                session.realDuration = session.finishedTime - new Date(session.inProgressTime);                
             }
 
             session.state = sessionUpdated.state;

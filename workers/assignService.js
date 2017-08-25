@@ -12,6 +12,9 @@ var AdvisoryServiceServices = require('../services/advisoryService');
 
 var AssignService = {};
 
+/**
+ * Validate if it's possible make the assignment
+ */
 AssignService.validate = request => {
     request.date = new Date();
     return Promise.all([
@@ -42,21 +45,26 @@ AssignService.validate = request => {
         });
 };
 
+/**
+ * Assign the advisory to the teacher and change the advisory state.
+ */
 AssignService.assign = request => {
     request.advisoryService.state = AdvisoryServiceState.IN_PROCESS.value;
-    request.advisoryService.teacher = {
-        name: `${request.teacher.name} ${request.teacher.lastName}`,
-        id: request.teacher.id
-    };
+    request.advisoryService.teacher = request.teacher.id;
 
     request.teacher.advisoryServices.push(request.advisoryService.id);
-    console.log(request.advisoryService.files);
+    
     return Promise.all([
         AdvisoryServiceServices.updateAdvisoryService(request.advisoryService.id, request.advisoryService),
         TeacherServices.updateTeacher(request.teacher.id, request.teacher)
     ]);
 };
 
+/**
+ * Notify to:
+ *  -   Teacher
+ *  -   Student
+ */
 AssignService.notify = (request, values, err) => {
     request.dateToShow = moment(request.date).format('MMMM Do YYYY, h:mm:ss a');
     var notification = {};
