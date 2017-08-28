@@ -9,6 +9,7 @@ var config = require('../config');
 var TeacherServices = require('../services/teacher');
 var NotificationServices = require('../services/notification');
 var AdvisoryServiceServices = require('../services/advisoryService');
+var LogService = require("../services/log")(process.env.LOG_ENTRIES_WORKER_ASSIGN_SERVICE_TOKEN);
 
 var AssignService = {};
 
@@ -90,17 +91,21 @@ var app = Consumer.create({
     batchSize: 1,
     handleMessage: async (message, done) => {
 
+        message.Body = JSON.parse(message.Body);
         var updatedObjects;
-        var request = JSON.parse(message.Body);
+        var request = message.Body;
         console.log('--------------------------------------------------');
         console.log(`Start Process : ${new Date()}`);
         console.log(`Id: ${request.id} - teacherId: ${request.teacherId} - advisoryServiceId: ${request.advisoryServiceId}`);
+        LogService.log("assignService","assign","Start Process", "info", message);
 
         try {
             request = await AssignService.validate(request);
             updatedObjects = await AssignService.assign(request);
             AssignService.notify(request, updatedObjects, null);
+            LogService.log("assignService","assign","Success Process", "info", {teacherId:request.teacherId,advisoryServiceId:request.advisoryServiceId});
         } catch (err) {
+            LogService.log("assignService","assign","Fail Process", "err", err);
             await AssignService.notify(request, null, err);
         } finally {
             console.log('--------------------------------------------------');

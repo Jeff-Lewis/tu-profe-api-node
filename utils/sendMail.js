@@ -93,8 +93,8 @@ MailTemplateServices.getMailTemplateById('STUDENT_SIGN_UP')
   .catch(err => console.log(err));
 */
 
-/*
-var SQSServices = require('../services/sqs');
+
+/*var SQSServices = require('../services/sqs');
 var MailType = require('../models/enum/mailType');
 var config = require('../config');
 
@@ -106,9 +106,21 @@ var sqsAttributes = {
   MailType: { DataType: 'String', StringValue: MailType.STUDENT_SIGN_UP.key },
   Mail: { DataType: 'String', StringValue: student.email }
 };
-SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);
-*/
+SQSServices.sendMessage(config.queues.mailQueue, JSON.stringify(student), null, sqsAttributes);*/
 
+var SQSServices = require('../services/sqs');
+var uuidV4 = require('uuid/v4');
+var config = require('../config');
+
+var message = {
+    id: uuidV4(),
+    teacherId: '1',
+    advisoryServiceId: '1'
+};
+
+SQSServices.sendMessage(config.queues.assignAdvisoryService, JSON.stringify(message), 'Assign');
+
+/*
 var data = {
   x_cust_id_cliente: '13529',
   x_ref_payco: '374136',
@@ -153,3 +165,4 @@ var data = {
   x_test_request: 'TRUE' };
 
   console.log(JSON.stringify(data));
+  */

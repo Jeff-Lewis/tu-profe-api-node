@@ -5,7 +5,7 @@ var config = require('../config');
 var MailTemplateServices = require('../services/mailTemplate');
 var NodemailerServices = require('../services/nodemailer');
 var UtilsServices = require('../services/utils');
-var LogService = require("../services/log")();
+var LogService = require("../services/log")(process.env.LOG_ENTRIES_WORKER_MAIL_SENDER_TOKEN);
 
 var app = Consumer.create({
     queueUrl: config.queues.mailQueue,
@@ -13,8 +13,9 @@ var app = Consumer.create({
     attributeNames: ['All'],
     messageAttributeNames: ['MailType', 'Mail'],
     handleMessage: (message, done) => {
-
-        var data = JSON.parse(message.Body);
+        
+        message.Body = JSON.parse(message.Body);
+        var data = message.Body;
         console.log('--------------------------------------------------');
         console.log(`Start Process : ${new Date()}`);
         console.log(`MailType : ${message.MessageAttributes.MailType.StringValue}`);
@@ -41,7 +42,7 @@ var app = Consumer.create({
             .then(()=>LogService.log("mailSender","send","Finish Process Success", "info", {}))
             .catch(err => LogService.log("mailSender","send","Finish Process Error", "err", err));
 
-        return done();
+        return //done();
 
     }
 });
@@ -51,3 +52,4 @@ app.on('error', function (err) {
 });
 
 app.start();
+
